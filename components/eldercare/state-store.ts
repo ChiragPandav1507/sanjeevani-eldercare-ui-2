@@ -14,16 +14,14 @@ export interface UserProfile {
 }
 
 const DEFAULT_PROFILE: UserProfile = {
-  name: 'Shanti Devi',
-  age: '72',
-  city: 'Delhi',
-  avatar: '👵',
+  name: '',
+  age: '',
+  city: '',
+  avatar: '',
 };
 
 const DEFAULT_MEDS: MedicineItem[] = [
-  { id: 1, name: 'Paracetamol 500 mg', dosage: '1-0-1 (After Food)', time: '8:00 AM', taken: true },
-  { id: 2, name: 'Amlodipine 5 mg', dosage: '1-0-0 (Morning)', time: '8:00 AM', taken: false },
-  { id: 3, name: 'Metformin 500 mg', dosage: '1-0-1 (After Food)', time: '8:00 AM', taken: false },
+   
 ];
 
 export const getStoredProfile = (): UserProfile => {
@@ -59,12 +57,12 @@ export const setStoredMeds = (meds: MedicineItem[]) => {
 };
 
 export const getStoredWater = (): number => {
-  if (typeof window === 'undefined') return 4;
+  if (typeof window === 'undefined') return 0;
   try {
     const data = localStorage.getItem('sanjeevani_water');
-    return data ? Number(data) : 4;
+    return data ? Number(data) : 0;
   } catch {
-    return 4;
+    return 0;
   }
 };
 

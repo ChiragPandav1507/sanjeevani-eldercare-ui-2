@@ -41,7 +41,7 @@ const SCREENS = [
 type ScreenId = 1 | '2A' | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
 
 export function ScreenSwitcher() {
-  const [active, setActive] = useState<ScreenId>(6);
+  const [active, setActive] = useState<ScreenId>(1);
   const [showDevPanel, setShowDevPanel] = useState(false);
   const [activeScanMode, setActiveScanMode] = useState<'prescription' | 'strip_expiry'>('strip_expiry');
   const [showAlarm, setShowAlarm] = useState(false);
@@ -76,7 +76,7 @@ export function ScreenSwitcher() {
     <TalkBackProvider>
       <div className="relative mx-auto flex min-h-screen max-w-md flex-col bg-slate-50 shadow-2xl border-x border-slate-200">
         {/* Floating Top Bar (Test Controls) */}
-        <div className="sticky top-2 z-40 flex items-center justify-between px-3 pointer-events-none">
+        <div className="hidden sticky top-2 z-40 flex items-center justify-between px-3 pointer-events-none">
           <div className="flex items-center gap-1.5 pointer-events-auto">
             {/* Voice Assistant Button */}
             <button
