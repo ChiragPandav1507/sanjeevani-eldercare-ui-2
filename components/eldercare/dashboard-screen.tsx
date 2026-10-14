@@ -33,7 +33,7 @@ export function DashboardScreen({ onOpenVoice, onNavigate }: DashboardScreenProp
             <span className="text-[11px] font-black uppercase tracking-wider text-emerald-700">
               Sanjeevani Elder Care
             </span>
-            <h1 className="text-2xl font-black text-slate-900">Namaste, Dada Ji 🙏</h1>
+            <h1 className="text-2xl font-black text-slate-900">Namaste,  🙏</h1>
           </div>
 
           {/* Voice Assistant Mic Trigger */}

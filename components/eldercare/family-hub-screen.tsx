@@ -62,7 +62,7 @@ export function FamilyHubScreen({ onBack }: FamilyHubScreenProps) {
                 ⚠️ Koi Activity Record Nahi Hui
               </h2>
               <p className="text-xs text-amber-900 mt-1 leading-relaxed">
-                Pichle 4 ghante se Dada Ji ne na koi dawaai mark ki hai, na paani ka glass log kiya hai. Kripya check karein.
+                Pichle 4 ghante se User ne na koi dawaai mark ki hai, na paani ka glass log kiya hai. Kripya check karein.
               </p>
             </div>
 
