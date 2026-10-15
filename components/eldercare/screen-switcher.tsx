@@ -42,8 +42,6 @@ type ScreenId = 1 | '2A' | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
 
 export function ScreenSwitcher() {
   const [active, setActive] = useState<ScreenId>(1);
-  const { speak } = useTalkBack();
-
   useEffect(() => {
     const audioGuides: Record<string, string> = {
       '1': 'Namaste! Sanjeevani Elder Care mein aapka swagat hai.',
@@ -63,13 +61,19 @@ export function ScreenSwitcher() {
     };
 
     const message = audioGuides[String(active)];
-    if (message && speak) {
+    if (message && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(message);
+      utterance.lang = 'hi-IN';
+      utterance.rate = 0.9;
+
       const timer = setTimeout(() => {
-        speak(message);
-      }, 350);
+        window.speechSynthesis.speak(utterance);
+      }, 300);
+
       return () => clearTimeout(timer);
     }
-  }, [active, speak]);
+  }, [active]);
   const [showDevPanel, setShowDevPanel] = useState(false);
   const [activeScanMode, setActiveScanMode] = useState<'prescription' | 'strip_expiry'>('strip_expiry');
   const [showAlarm, setShowAlarm] = useState(false);
