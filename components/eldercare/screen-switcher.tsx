@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Layers, ChevronDown, ChevronUp, Bell, Activity, Mic } from 'lucide-react';
-import { TalkBackProvider } from './talkback-provider';
+import { TalkBackProvider, useTalkBack } from './talkback-provider';
 import { MedicineAlarmModal } from './medicine-alarm-modal';
 import { FallDetectionModal } from './fall-detection-modal';
 import { VoiceAssistantModal } from './voice-assistant-modal';
@@ -42,6 +42,34 @@ type ScreenId = 1 | '2A' | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
 
 export function ScreenSwitcher() {
   const [active, setActive] = useState<ScreenId>(1);
+  const { speak } = useTalkBack();
+
+  useEffect(() => {
+    const audioGuides: Record<string, string> = {
+      '1': 'Namaste! Sanjeevani Elder Care mein aapka swagat hai.',
+      '2A': 'Elder registration screen.',
+      '3': 'Visually impaired registration screen.',
+      '4': 'Voice form khul gaya hai.',
+      '5': 'Login screen.',
+      '6': 'Dashboard. Yahan aapki saari health details aur updates hain.',
+      '8': 'Prescription scanner camera open ho gaya hai.',
+      '9': 'Prescription result screen.',
+      '10': 'Medicine cabinet screen.',
+      '11': 'Doctor appointments screen.',
+      '12': 'Water tracker screen.',
+      '13': 'Daily wellbeing screen.',
+      '14': 'Family hub khul gaya hai.',
+      '15': 'Emergency SOS screen.',
+    };
+
+    const message = audioGuides[String(active)];
+    if (message && speak) {
+      const timer = setTimeout(() => {
+        speak(message);
+      }, 350);
+      return () => clearTimeout(timer);
+    }
+  }, [active, speak]);
   const [showDevPanel, setShowDevPanel] = useState(false);
   const [activeScanMode, setActiveScanMode] = useState<'prescription' | 'strip_expiry'>('strip_expiry');
   const [showAlarm, setShowAlarm] = useState(false);
