@@ -265,3 +265,31 @@ export function ScreenSwitcher() {
             <SosEmergencyScreen onCancel={() => setActive(6)} />
           )}
         </div>
+
+        {showAlarm && (
+          <MedicineAlarmModal
+            medicineName="Paracetamol 500 mg"
+            dosage="1 tablet (After Lunch)"
+            onTake={() => setShowAlarm(false)}
+            onSnooze={() => setShowAlarm(false)}
+          />
+        )}
+
+        <FallDetectionModal
+          isOpen={showFallModal}
+          onCancel={() => setShowFallModal(false)}
+        />
+
+        <VoiceAssistantModal
+          isOpen={showVoiceSaathi}
+          onClose={() => setShowVoiceSaathi(false)}
+          onActionTrigger={(action) => {
+            if (action === 'SOS_TRIGGERED') setActive(15);
+            if (action === 'MEDICINE_TAKEN') setActive(10);
+            if (action === 'WATER_ADDED') setActive(12);
+          }}
+        />
+      </div>
+    </TalkBackProvider>
+  );
+}
