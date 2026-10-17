@@ -17,7 +17,6 @@ export function LoginScreen({
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(true);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,12 +75,12 @@ export function LoginScreen({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Password</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Set Password</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
-                placeholder="Enter password"
+                placeholder="Create password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-xs"
@@ -94,26 +93,6 @@ export function LoginScreen({
                 {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
               </button>
             </div>
-          </div>
-
-          <div className="flex items-center justify-between pt-0.5">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="size-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-              />
-              <span className="text-xs text-slate-600 font-medium">Remember me</span>
-            </label>
-
-            <button
-              type="button"
-              onClick={() => alert('OTP reset link sent to your registered mobile number.')}
-              className="text-xs font-bold text-emerald-700 hover:underline"
-            >
-              Forgot password?
-            </button>
           </div>
 
           <button
