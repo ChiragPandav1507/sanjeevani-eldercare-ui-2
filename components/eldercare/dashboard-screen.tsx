@@ -1,190 +1,294 @@
 'use client';
 
-import React from 'react';
-import {
-  Pill,
-  Droplets,
-  Calendar,
-  Users,
-  Camera,
-  AlertOctagon,
-  Heart,
-  Mic,
-  ChevronRight,
-  Activity,
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Layers, ChevronDown, ChevronUp, Bell, Activity, Mic } from 'lucide-react';
+import { TalkBackProvider, useTalkBack } from './talkback-provider';
+import { MedicineAlarmModal } from './medicine-alarm-modal';
+import { FallDetectionModal } from './fall-detection-modal';
+import { VoiceAssistantModal } from './voice-assistant-modal';
+import { WelcomeScreen } from './welcome-screen';
+import { ElderRegistrationScreen } from './elder-registration-screen';
+import { VisuallyImpairedRegistrationScreen } from './visually-impaired-registration-screen';
+import { VoiceFormScreen } from './voice-form-screen';
+import { LoginScreen } from './login-screen';
+import { ActualLoginScreen } from './actual-login-screen';
+import { DashboardScreen } from './dashboard-screen';
+import { PrescriptionScannerScreen } from './prescription-scanner-screen';
+import { PrescriptionResultScreen } from './prescription-result-screen';
+import { MedicineCabinetScreen } from './medicine-cabinet-screen';
+import { AppointmentsScreen } from './appointments-screen';
+import { WaterTrackerScreen } from './water-tracker-screen';
+import { DailyWellbeingScreen } from './daily-wellbeing-screen';
+import { FamilyHubScreen } from './family-hub-screen';
+import { SosEmergencyScreen } from './sos-emergency-screen';
 
-interface DashboardScreenProps {
-  language: string;
-  waterCount: number;
-  medicineCount: number;
-  appointmentText: string;
-  contactsCount: number;
-  onOpenVoice: () => void;
-  onNavigate: (screenId: any) => void;
-}
+const SCREENS = [
+  { id: 1, label: '1. Welcome' },
+  { id: '2A', label: '2A. Elder Reg' },
+  { id: 3, label: '3. Visually Imp' },
+  { id: 4, label: '4. Voice Reg' },
+  { id: 5, label: '5. Account Creation' },
+  { id: 16, label: '16. Actual Login' },
+  { id: 6, label: '6. Dashboard' },
+  { id: 8, label: '8. Scanner' },
+  { id: 9, label: '9. AI Result' },
+  { id: 10, label: '10. Medicines' },
+  { id: 11, label: '11. Appointments' },
+  { id: 12, label: '12. Water' },
+  { id: 13, label: '13. Wellbeing' },
+  { id: 14, label: '14. Family Hub' },
+  { id: 15, label: '15. SOS' },
+] as const;
 
-export function DashboardScreen({
-  language,
-  waterCount,
-  medicineCount,
-  appointmentText,
-  contactsCount,
-  onOpenVoice,
-  onNavigate,
-}: DashboardScreenProps) {
+type ScreenId = 1 | '2A' | 3 | 4 | 5 | 16 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
+
+function ScreenSwitcherContent() {
+  const [active, setActive] = useState<ScreenId>(1);
+  const { isEnabled } = useTalkBack();
+
+  const [language, setLanguage] = useState<string>('hi');
+  const [waterCount, setWaterCount] = useState<number>(0);
+  const [medicineCount, setMedicineCount] = useState<number>(1);
+  const [appointmentText, setAppointmentText] = useState<string>('Koi Appointment Nahi');
+  const [contactsCount, setContactsCount] = useState<number>(0);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+
+    if (!isEnabled) return;
+
+    const audioGuides: Record<string, string> = {
+      '1': 'Namaste! Sanjeevani Elder Care mein aapka swagat hai.',
+      '2A': 'Elder registration screen.',
+      '3': 'Visually impaired registration screen.',
+      '4': 'Voice form khul gaya hai.',
+      '5': 'Account creation screen.',
+      '16': 'Login screen.',
+      '6': 'Dashboard. Yahan aapki saari health details aur updates hain.',
+      '8': 'Prescription scanner camera open ho gaya hai.',
+      '9': 'Prescription result screen.',
+      '10': 'Medicine cabinet screen.',
+      '11': 'Doctor appointments screen.',
+      '12': 'Water tracker screen.',
+      '13': 'Daily wellbeing screen.',
+      '14': 'Family hub khul gaya hai.',
+      '15': 'Emergency SOS screen.',
+    };
+
+    const message = audioGuides[String(active)];
+    if (message && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(message);
+      utterance.lang = language === 'en' ? 'en-US' : 'hi-IN';
+      utterance.rate = 0.9;
+
+      const timer = setTimeout(() => {
+        window.speechSynthesis.speak(utterance);
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+  }, [active, isEnabled, language]);
+
+  const [showDevPanel, setShowDevPanel] = useState(false);
+  const [activeScanMode, setActiveScanMode] = useState<'prescription' | 'strip_expiry'>('strip_expiry');
+  const [showAlarm, setShowAlarm] = useState(false);
+  const [showFallModal, setShowFallModal] = useState(false);
+  const [showVoiceSaathi, setShowVoiceSaathi] = useState(false);
+
+  useEffect(() => {
+    let lastZ = 0;
+    const handleMotion = (event: DeviceMotionEvent) => {
+      const acc = event.accelerationIncludingGravity;
+      if (!acc || acc.z === null) return;
+      const deltaZ = Math.abs((acc.z || 0) - lastZ);
+      lastZ = acc.z || 0;
+      if (deltaZ > 25) {
+        setShowFallModal(true);
+      }
+    };
+
+    if (typeof window !== 'undefined' && 'DeviceMotionEvent' in window) {
+      window.addEventListener('devicemotion', handleMotion);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('devicemotion', handleMotion);
+      }
+    };
+  }, []);
+
   return (
-    <div className="flex min-h-screen flex-col bg-[#f8fafc] text-slate-800 pb-12 select-none">
-      <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3.5 shadow-xs sticky top-0 z-20">
-        <div className="flex items-center gap-2">
-          <div className="flex size-9 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-xs">
-            <Heart className="size-5 fill-current" />
-          </div>
-          <div>
-            <h1 className="text-base font-black text-slate-900 leading-tight">Sanjeevani</h1>
-            <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">ElderCare+</p>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={onOpenVoice}
-          className="flex items-center gap-1.5 rounded-xl bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 border border-emerald-200 hover:bg-emerald-100 active:scale-95 transition-all"
-        >
-          <Mic className="size-4" />
-          <span>Saathi</span>
-        </button>
-      </header>
-
-      <main className="flex-1 max-w-md mx-auto w-full px-4 pt-5 space-y-4">
-        <button
-          type="button"
-          onClick={() => onNavigate(15)}
-          className="w-full rounded-3xl bg-red-600 p-4 text-white shadow-lg hover:bg-red-700 active:scale-98 transition-all flex items-center justify-between"
-        >
-          <div className="flex items-center gap-3">
-            <div className="flex size-12 items-center justify-center rounded-2xl bg-white/20">
-              <AlertOctagon className="size-7" />
-            </div>
-            <div className="text-left">
-              <h2 className="text-lg font-black tracking-wide leading-tight">EMERGENCY SOS</h2>
-              <p className="text-xs font-medium text-red-100">
-                {language === 'en' ? 'Instantly alert family & doctor' : 'Turant Parivaar aur Doctor ko alert bhejein'}
-              </p>
-            </div>
-          </div>
-          <ChevronRight className="size-6 text-white/80" />
-        </button>
-
-        <button
-          type="button"
-          onClick={() => onNavigate(8)}
-          className="w-full rounded-3xl bg-blue-600 p-5 text-white shadow-md hover:bg-blue-700 active:scale-98 transition-all space-y-3"
-        >
-          <div className="flex items-center justify-between">
-            <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider">
-              AI Health Vision
-            </span>
-            <span className="text-xs font-bold text-blue-100">Drug Conflict Guard</span>
-          </div>
-          <div className="flex items-center gap-3.5 text-left">
-            <div className="flex size-12 items-center justify-center rounded-2xl bg-white text-blue-600 shadow-sm shrink-0">
-              <Camera className="size-6" />
-            </div>
-            <div>
-              <h3 className="text-base font-black leading-tight">Scan Doctor Prescription</h3>
-              <p className="text-xs text-blue-100 font-medium">
-                {language === 'en' ? 'Check medicine name, expiry date & safety' : 'Dawaai ka naam, expiry date aur safety check karein'}
-              </p>
-            </div>
-          </div>
-        </button>
-
-        <div className="grid grid-cols-2 gap-3">
+    <div className="relative mx-auto flex min-h-screen max-w-md flex-col bg-slate-50 shadow-2xl border-x border-slate-200">
+      <div className="hidden sticky top-2 z-40 flex items-center justify-between px-3 pointer-events-none">
+        <div className="flex items-center gap-1.5 pointer-events-auto">
           <button
             type="button"
-            onClick={() => onNavigate(10)}
-            className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-4 shadow-xs hover:border-slate-300 active:scale-98 transition-all text-left min-h-[120px]"
+            onClick={() => setShowVoiceSaathi(true)}
+            className="flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-[11px] font-black text-white shadow-lg hover:bg-emerald-700 transition-all border border-emerald-400 active:scale-95"
+            title="Open Voice Assistant Saathi"
           >
-            <div className="flex size-10 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
-              <Pill className="size-5" />
-            </div>
-            <div>
-              <span className="block text-[11px] font-bold text-slate-400">
-                {medicineCount} {language === 'en' ? 'Medicines Left' : 'Dawaai Baaki'}
-              </span>
-              <h3 className="text-sm font-black text-slate-900 leading-tight">Medicine Cabinet</h3>
-            </div>
+            <Mic className="size-3" />
+            <span>Saathi</span>
           </button>
 
           <button
             type="button"
-            onClick={() => onNavigate(12)}
-            className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-4 shadow-xs hover:border-slate-300 active:scale-98 transition-all text-left min-h-[120px]"
+            onClick={() => setShowAlarm(true)}
+            className="flex items-center gap-1 rounded-full bg-amber-500 px-2 py-1 text-[11px] font-black text-slate-950 shadow-lg hover:bg-amber-400 transition-all border border-amber-300 active:scale-95"
           >
-            <div className="flex size-10 items-center justify-center rounded-2xl bg-blue-100 text-blue-700">
-              <Droplets className="size-5" />
-            </div>
-            <div>
-              <span className="block text-[11px] font-bold text-slate-400">
-                {waterCount} / 8 Glass
-              </span>
-              <h3 className="text-sm font-black text-slate-900 leading-tight">Water Tracker</h3>
-            </div>
+            <Bell className="size-3 fill-current" />
+            <span>Alarm</span>
           </button>
 
           <button
             type="button"
-            onClick={() => onNavigate(11)}
-            className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-4 shadow-xs hover:border-slate-300 active:scale-98 transition-all text-left min-h-[120px]"
+            onClick={() => setShowFallModal(true)}
+            className="flex items-center gap-1 rounded-full bg-red-600 px-2 py-1 text-[11px] font-black text-white shadow-lg hover:bg-red-700 transition-all border border-red-400 active:scale-95"
           >
-            <div className="flex size-10 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
-              <Calendar className="size-5" />
-            </div>
-            <div>
-              <span className="block text-[11px] font-bold text-slate-400">
-                {appointmentText === 'Koi Appointment Nahi' && language === 'en' ? 'No Appointments' : appointmentText}
-              </span>
-              <h3 className="text-sm font-black text-slate-900 leading-tight">Appointments</h3>
-            </div>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => onNavigate(14)}
-            className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-4 shadow-xs hover:border-slate-300 active:scale-98 transition-all text-left min-h-[120px]"
-          >
-            <div className="flex size-10 items-center justify-center rounded-2xl bg-purple-100 text-purple-700">
-              <Users className="size-5" />
-            </div>
-            <div>
-              <span className="block text-[11px] font-bold text-slate-400">
-                {contactsCount} Contacts Linked
-              </span>
-              <h3 className="text-sm font-black text-slate-900 leading-tight">Family Hub</h3>
-            </div>
+            <Activity className="size-3" />
+            <span>Fall</span>
           </button>
         </div>
 
         <button
           type="button"
-          onClick={() => onNavigate(13)}
-          className="w-full flex items-center justify-between rounded-3xl border border-slate-200 bg-white p-4 shadow-xs hover:border-slate-300 active:scale-98 transition-all"
+          onClick={() => setShowDevPanel(!showDevPanel)}
+          className="pointer-events-auto flex items-center gap-1.5 rounded-full bg-slate-900/90 px-3 py-1.5 text-[11px] font-bold text-white shadow-lg hover:bg-slate-950 transition-all border border-white/20 active:scale-95"
         >
-          <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-2xl bg-rose-100 text-rose-600">
-              <Activity className="size-5" />
-            </div>
-            <div className="text-left">
-              <h3 className="text-xs font-black text-slate-900">Daily Health Check-in</h3>
-              <p className="text-[11px] text-slate-500 font-medium">
-                {language === 'en' ? 'How are you feeling today?' : 'Kaisa mehsus ho raha hai aaj?'}
-              </p>
-            </div>
-          </div>
-          <ChevronRight className="size-5 text-slate-400" />
+          <Layers className="size-3.5 text-emerald-400" />
+          <span>Screen: {active}</span>
+          {showDevPanel ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
         </button>
-      </main>
-    </div>
-  );
-}
+      </div>
+
+      {showDevPanel && (
+        <div className="sticky top-11 z-40 mx-3 mb-2 rounded-2xl bg-slate-900/95 p-3 text-white shadow-2xl backdrop-blur-md border border-slate-700 space-y-2">
+          <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 border-b border-slate-800 pb-1.5">
+            <span>Direct Jump to Any Screen</span>
+            <span className="text-emerald-400">15 Screens Active</span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-1.5 max-h-60 overflow-y-auto pr-1">
+            {SCREENS.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => {
+                  setActive(s.id as ScreenId);
+                  setShowDevPanel(false);
+                }}
+                className={`rounded-xl px-2.5 py-1.5 text-left text-[11px] font-semibold transition-all ${
+                  active === s.id
+                    ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                    : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white'
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="flex-1">
+        {active === 1 && (
+          <WelcomeScreen
+            language={language}
+            setLanguage={setLanguage}
+            onSelectElderly={() => setActive(5)}
+            onSelectVisuallyImpaired={() => setActive(3)}
+          />
+        )}
+        {active === '2A' && (
+          <ElderRegistrationScreen
+            onBack={() => setActive(5)}
+            onNext={() => setActive(6)}
+          />
+        )}
+        {active === 3 && (
+          <VisuallyImpairedRegistrationScreen
+            onBack={() => setActive(1)}
+            onContinue={(mode) => {
+              if (mode === 'voice') setActive(4);
+              else setActive(5);
+            }}
+          />
+        )}
+        {active === 4 && (
+          <VoiceFormScreen
+            onBack={() => setActive(3)}
+            onSubmitSuccess={() => setActive(6)}
+          />
+        )}
+        {active === 5 && (
+          <LoginScreen
+            onLoginSuccess={() => setActive('2A')}
+            onContinueGuest={() => setActive('2A')}
+            onGoToRegister={() => setActive(16)}
+          />
+        )}
+        {active === 16 && (
+          <ActualLoginScreen
+            onLoginSuccess={() => setActive(6)}
+            onContinueGuest={() => setActive(6)}
+            onGoToRegister={() => setActive(5)}
+          />
+        )}
+        {active === 6 && (
+          <DashboardScreen
+            language={language}
+            waterCount={waterCount}
+            medicineCount={medicineCount}
+            appointmentText={appointmentText}
+            contactsCount={contactsCount}
+            onOpenVoice={() => setShowVoiceSaathi(true)}
+            onNavigate={(id) => setActive(id)}
+          />
+        )}
+        {active === 8 && (
+          <PrescriptionScannerScreen
+            onBack={() => setActive(6)}
+            onScanComplete={(mode) => {
+              setActiveScanMode(mode);
+              setActive(9);
+            }}
+          />
+        )}
+        {active === 9 && (
+          <PrescriptionResultScreen
+            scanMode={activeScanMode}
+            onBack={() => setActive(8)}
+            onSaveToCabinet={() => {
+              setMedicineCount((prev) => prev + 1);
+              setActive(10);
+            }}
+          />
+        )}
+        {active === 10 && (
+          <MedicineCabinetScreen onBack={() => setActive(6)} />
+        )}
+        {active === 11 && (
+          <AppointmentsScreen onBack={() => setActive(6)} />
+        )}
+        {active === 12 && (
+          <WaterTrackerScreen
+            waterCount={waterCount}
+            setWaterCount={setWaterCount}
+            onBack={() => setActive(6)}
+          />
+        )}
+        {active === 13 && (
+          <DailyWellbeingScreen onBack={() => setActive(6)} />
+        )}
+        {active === 14 && (
+          <FamilyHubScreen onBack={() => setActive(6)} />
+        )}
+        {active === 15 && (
+          <SosEmergencyScreen onCancel={() => setActive(6)} />
+        )}
+      </div>
+
+      {showAlarm && (
