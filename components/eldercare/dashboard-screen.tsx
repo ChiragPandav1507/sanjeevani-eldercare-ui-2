@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 
 interface DashboardScreenProps {
+  language: string;
   waterCount: number;
   medicineCount: number;
   appointmentText: string;
@@ -24,6 +25,7 @@ interface DashboardScreenProps {
 }
 
 export function DashboardScreen({
+  language,
   waterCount,
   medicineCount,
   appointmentText,
@@ -39,12 +41,8 @@ export function DashboardScreen({
             <Heart className="size-5 fill-current" />
           </div>
           <div>
-            <h1 className="text-base font-black text-slate-900 leading-tight">
-              Sanjeevani
-            </h1>
-            <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">
-              ElderCare+
-            </p>
+            <h1 className="text-base font-black text-slate-900 leading-tight">Sanjeevani</h1>
+            <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">ElderCare+</p>
           </div>
         </div>
 
@@ -69,11 +67,9 @@ export function DashboardScreen({
               <AlertOctagon className="size-7" />
             </div>
             <div className="text-left">
-              <h2 className="text-lg font-black tracking-wide leading-tight">
-                EMERGENCY SOS
-              </h2>
+              <h2 className="text-lg font-black tracking-wide leading-tight">EMERGENCY SOS</h2>
               <p className="text-xs font-medium text-red-100">
-                Turant Parivaar aur Doctor ko alert bhejein
+                {language === 'en' ? 'Instantly alert family & doctor' : 'Turant Parivaar aur Doctor ko alert bhejein'}
               </p>
             </div>
           </div>
@@ -89,20 +85,16 @@ export function DashboardScreen({
             <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider">
               AI Health Vision
             </span>
-            <span className="text-xs font-bold text-blue-100">
-              Drug Conflict Guard
-            </span>
+            <span className="text-xs font-bold text-blue-100">Drug Conflict Guard</span>
           </div>
           <div className="flex items-center gap-3.5 text-left">
             <div className="flex size-12 items-center justify-center rounded-2xl bg-white text-blue-600 shadow-sm shrink-0">
               <Camera className="size-6" />
             </div>
             <div>
-              <h3 className="text-base font-black leading-tight">
-                Scan Doctor Prescription
-              </h3>
+              <h3 className="text-base font-black leading-tight">Scan Doctor Prescription</h3>
               <p className="text-xs text-blue-100 font-medium">
-                Dawaai ka naam, expiry date aur safety check karein
+                {language === 'en' ? 'Check medicine name, expiry date & safety' : 'Dawaai ka naam, expiry date aur safety check karein'}
               </p>
             </div>
           </div>
@@ -119,11 +111,9 @@ export function DashboardScreen({
             </div>
             <div>
               <span className="block text-[11px] font-bold text-slate-400">
-                {medicineCount} Dawaai Baaki
+                {medicineCount} {language === 'en' ? 'Medicines Left' : 'Dawaai Baaki'}
               </span>
-              <h3 className="text-sm font-black text-slate-900 leading-tight">
-                Medicine Cabinet
-              </h3>
+              <h3 className="text-sm font-black text-slate-900 leading-tight">Medicine Cabinet</h3>
             </div>
           </button>
 
@@ -139,9 +129,7 @@ export function DashboardScreen({
               <span className="block text-[11px] font-bold text-slate-400">
                 {waterCount} / 8 Glass
               </span>
-              <h3 className="text-sm font-black text-slate-900 leading-tight">
-                Water Tracker
-              </h3>
+              <h3 className="text-sm font-black text-slate-900 leading-tight">Water Tracker</h3>
             </div>
           </button>
 
@@ -155,11 +143,9 @@ export function DashboardScreen({
             </div>
             <div>
               <span className="block text-[11px] font-bold text-slate-400">
-                {appointmentText}
+                {appointmentText === 'Koi Appointment Nahi' && language === 'en' ? 'No Appointments' : appointmentText}
               </span>
-              <h3 className="text-sm font-black text-slate-900 leading-tight">
-                Appointments
-              </h3>
+              <h3 className="text-sm font-black text-slate-900 leading-tight">Appointments</h3>
             </div>
           </button>
 
@@ -173,11 +159,9 @@ export function DashboardScreen({
             </div>
             <div>
               <span className="block text-[11px] font-bold text-slate-400">
-                {contactsCount} Contacts Linked
+                {contactsCount} {language === 'en' ? 'Contacts Linked' : 'Contacts Linked'}
               </span>
-              <h3 className="text-sm font-black text-slate-900 leading-tight">
-                Family Hub
-              </h3>
+              <h3 className="text-sm font-black text-slate-900 leading-tight">Family Hub</h3>
             </div>
           </button>
         </div>
@@ -192,11 +176,9 @@ export function DashboardScreen({
               <Activity className="size-5" />
             </div>
             <div className="text-left">
-              <h3 className="text-xs font-black text-slate-900">
-                Daily Health Check-in
-              </h3>
+              <h3 className="text-xs font-black text-slate-900">Daily Health Check-in</h3>
               <p className="text-[11px] text-slate-500 font-medium">
-                Kaisa mehsus ho raha hai aaj?
+                {language === 'en' ? 'How are you feeling today?' : 'Kaisa mehsus ho raha hai aaj?'}
               </p>
             </div>
           </div>
