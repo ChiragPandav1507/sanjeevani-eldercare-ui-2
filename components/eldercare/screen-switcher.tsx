@@ -43,7 +43,7 @@ const SCREENS = [
 type ScreenId = 1 | '2A' | 3 | 4 | 5 | 16 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
 
 function ScreenSwitcherContent() {
-  const [active, setActive] = useState<ScreenId>(1);
+  const [active, setActive] = useState<ScreenId>(5);
   const { isEnabled } = useTalkBack();
 
   useEffect(() => {
@@ -196,8 +196,8 @@ function ScreenSwitcherContent() {
         )}
         {active === '2A' && (
           <ElderRegistrationScreen
-            onBack={() => setActive(1)}
-            onNext={() => setActive(5)}
+            onBack={() => setActive(5)}
+            onNext={() => setActive(6)}
           />
         )}
         {active === 3 && (
@@ -217,8 +217,8 @@ function ScreenSwitcherContent() {
         )}
         {active === 5 && (
           <LoginScreen
-            onLoginSuccess={() => setActive(6)}
-            onContinueGuest={() => setActive(6)}
+            onLoginSuccess={() => setActive('2A')}
+            onContinueGuest={() => setActive('2A')}
             onGoToRegister={() => setActive(16)}
           />
         )}
