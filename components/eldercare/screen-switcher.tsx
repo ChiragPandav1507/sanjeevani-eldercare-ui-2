@@ -11,6 +11,7 @@ import { ElderRegistrationScreen } from './elder-registration-screen';
 import { VisuallyImpairedRegistrationScreen } from './visually-impaired-registration-screen';
 import { VoiceFormScreen } from './voice-form-screen';
 import { LoginScreen } from './login-screen';
+import { ActualLoginScreen } from './actual-login-screen';
 import { DashboardScreen } from './dashboard-screen';
 import { PrescriptionScannerScreen } from './prescription-scanner-screen';
 import { PrescriptionResultScreen } from './prescription-result-screen';
@@ -26,7 +27,8 @@ const SCREENS = [
   { id: '2A', label: '2A. Elder Reg' },
   { id: 3, label: '3. Visually Imp' },
   { id: 4, label: '4. Voice Reg' },
-  { id: 5, label: '5. Sign Up / Login' },
+  { id: 5, label: '5. Account Creation' },
+  { id: 16, label: '16. Actual Login' },
   { id: 6, label: '6. Dashboard' },
   { id: 8, label: '8. Scanner' },
   { id: 9, label: '9. AI Result' },
@@ -38,11 +40,10 @@ const SCREENS = [
   { id: 15, label: '15. SOS' },
 ] as const;
 
-type ScreenId = 1 | '2A' | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
+type ScreenId = 1 | '2A' | 3 | 4 | 5 | 16 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
 
 export function ScreenSwitcher() {
   const [active, setActive] = useState<ScreenId>(1);
-  const [authMode, setAuthMode] = useState<'signup' | 'login'>('signup');
 
   useEffect(() => {
     const audioGuides: Record<string, string> = {
@@ -50,7 +51,8 @@ export function ScreenSwitcher() {
       '2A': 'Elder registration screen.',
       '3': 'Visually impaired registration screen.',
       '4': 'Voice form khul gaya hai.',
-      '5': authMode === 'signup' ? 'Create account screen.' : 'Login screen.',
+      '5': 'Account creation screen.',
+      '16': 'Login screen.',
       '6': 'Dashboard. Yahan aapki saari health details aur updates hain.',
       '8': 'Prescription scanner camera open ho gaya hai.',
       '9': 'Prescription result screen.',
@@ -75,7 +77,7 @@ export function ScreenSwitcher() {
 
       return () => clearTimeout(timer);
     }
-  }, [active, authMode]);
+  }, [active]);
 
   const [showDevPanel, setShowDevPanel] = useState(false);
   const [activeScanMode, setActiveScanMode] = useState<'prescription' | 'strip_expiry'>('strip_expiry');
@@ -155,7 +157,7 @@ export function ScreenSwitcher() {
           <div className="sticky top-11 z-40 mx-3 mb-2 rounded-2xl bg-slate-900/95 p-3 text-white shadow-2xl backdrop-blur-md border border-slate-700 space-y-2">
             <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 border-b border-slate-800 pb-1.5">
               <span>Direct Jump to Any Screen</span>
-              <span className="text-emerald-400">14 Screens Active</span>
+              <span className="text-emerald-400">15 Screens Active</span>
             </div>
 
             <div className="grid grid-cols-2 gap-1.5 max-h-60 overflow-y-auto pr-1">
@@ -190,10 +192,7 @@ export function ScreenSwitcher() {
           {active === '2A' && (
             <ElderRegistrationScreen
               onBack={() => setActive(1)}
-              onNext={() => {
-                setAuthMode('signup');
-                setActive(5);
-              }}
+              onNext={() => setActive(5)}
             />
           )}
           {active === 3 && (
@@ -215,7 +214,14 @@ export function ScreenSwitcher() {
             <LoginScreen
               onLoginSuccess={() => setActive(6)}
               onContinueGuest={() => setActive(6)}
-              onGoToRegister={() => setAuthMode(authMode === 'signup' ? 'login' : 'signup')}
+              onGoToRegister={() => setActive(16)}
+            />
+          )}
+          {active === 16 && (
+            <ActualLoginScreen
+              onLoginSuccess={() => setActive(6)}
+              onContinueGuest={() => setActive(6)}
+              onGoToRegister={() => setActive(5)}
             />
           )}
           {active === 6 && (
@@ -259,31 +265,3 @@ export function ScreenSwitcher() {
             <SosEmergencyScreen onCancel={() => setActive(6)} />
           )}
         </div>
-
-        {showAlarm && (
-          <MedicineAlarmModal
-            medicineName="Paracetamol 500 mg"
-            dosage="1 tablet (After Lunch)"
-            onTake={() => setShowAlarm(false)}
-            onSnooze={() => setShowAlarm(false)}
-          />
-        )}
-
-        <FallDetectionModal
-          isOpen={showFallModal}
-          onCancel={() => setShowFallModal(false)}
-        />
-
-        <VoiceAssistantModal
-          isOpen={showVoiceSaathi}
-          onClose={() => setShowVoiceSaathi(false)}
-          onActionTrigger={(action) => {
-            if (action === 'SOS_TRIGGERED') setActive(15);
-            if (action === 'MEDICINE_TAKEN') setActive(10);
-            if (action === 'WATER_ADDED') setActive(12);
-          }}
-        />
-      </div>
-    </TalkBackProvider>
-  );
-}
