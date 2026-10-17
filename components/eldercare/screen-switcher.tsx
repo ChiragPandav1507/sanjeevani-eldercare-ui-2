@@ -46,8 +46,9 @@ function ScreenSwitcherContent() {
   const [active, setActive] = useState<ScreenId>(1);
   const { isEnabled } = useTalkBack();
 
+  const [language, setLanguage] = useState<string>('hi');
   const [waterCount, setWaterCount] = useState<number>(0);
-  const [medicineCount, setMedicineCount] = useState<number>(0);
+  const [medicineCount, setMedicineCount] = useState<number>(1);
   const [appointmentText, setAppointmentText] = useState<string>('Koi Appointment Nahi');
   const [contactsCount, setContactsCount] = useState<number>(0);
 
@@ -79,7 +80,7 @@ function ScreenSwitcherContent() {
     const message = audioGuides[String(active)];
     if (message && typeof window !== 'undefined' && 'speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(message);
-      utterance.lang = 'hi-IN';
+      utterance.lang = language === 'en' ? 'en-US' : 'hi-IN';
       utterance.rate = 0.9;
 
       const timer = setTimeout(() => {
@@ -88,7 +89,7 @@ function ScreenSwitcherContent() {
 
       return () => clearTimeout(timer);
     }
-  }, [active, isEnabled]);
+  }, [active, isEnabled, language]);
 
   const [showDevPanel, setShowDevPanel] = useState(false);
   const [activeScanMode, setActiveScanMode] = useState<'prescription' | 'strip_expiry'>('strip_expiry');
@@ -195,6 +196,8 @@ function ScreenSwitcherContent() {
       <div className="flex-1">
         {active === 1 && (
           <WelcomeScreen
+            language={language}
+            setLanguage={setLanguage}
             onSelectElderly={() => setActive(5)}
             onSelectVisuallyImpaired={() => setActive(3)}
           />
@@ -236,6 +239,7 @@ function ScreenSwitcherContent() {
         )}
         {active === 6 && (
           <DashboardScreen
+            language={language}
             waterCount={waterCount}
             medicineCount={medicineCount}
             appointmentText={appointmentText}
