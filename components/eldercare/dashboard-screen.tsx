@@ -15,11 +15,19 @@ import {
 } from 'lucide-react';
 
 interface DashboardScreenProps {
+  waterCount: number;
+  medicineCount: number;
+  appointmentText: string;
+  contactsCount: number;
   onOpenVoice: () => void;
   onNavigate: (screenId: any) => void;
 }
 
 export function DashboardScreen({
+  waterCount,
+  medicineCount,
+  appointmentText,
+  contactsCount,
   onOpenVoice,
   onNavigate,
 }: DashboardScreenProps) {
@@ -111,7 +119,7 @@ export function DashboardScreen({
             </div>
             <div>
               <span className="block text-[11px] font-bold text-slate-400">
-                0 Dawaai Baaki
+                {medicineCount} Dawaai Baaki
               </span>
               <h3 className="text-sm font-black text-slate-900 leading-tight">
                 Medicine Cabinet
@@ -129,7 +137,7 @@ export function DashboardScreen({
             </div>
             <div>
               <span className="block text-[11px] font-bold text-slate-400">
-                0 / 8 Glass
+                {waterCount} / 8 Glass
               </span>
               <h3 className="text-sm font-black text-slate-900 leading-tight">
                 Water Tracker
@@ -147,7 +155,7 @@ export function DashboardScreen({
             </div>
             <div>
               <span className="block text-[11px] font-bold text-slate-400">
-                Koi Appointment Nahi
+                {appointmentText}
               </span>
               <h3 className="text-sm font-black text-slate-900 leading-tight">
                 Appointments
@@ -165,7 +173,7 @@ export function DashboardScreen({
             </div>
             <div>
               <span className="block text-[11px] font-bold text-slate-400">
-                0 Contacts Linked
+                {contactsCount} Contacts Linked
               </span>
               <h3 className="text-sm font-black text-slate-900 leading-tight">
                 Family Hub
