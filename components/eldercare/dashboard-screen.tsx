@@ -159,7 +159,7 @@ export function DashboardScreen({
             </div>
             <div>
               <span className="block text-[11px] font-bold text-slate-400">
-                {contactsCount} {language === 'en' ? 'Contacts Linked' : 'Contacts Linked'}
+                {contactsCount} Contacts Linked
               </span>
               <h3 className="text-sm font-black text-slate-900 leading-tight">Family Hub</h3>
             </div>
