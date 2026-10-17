@@ -27,9 +27,7 @@ export function ElderRegistrationScreen({ onBack, onNext }: ElderRegistrationScr
   
   // Modal for Screen 2B
   const [showFamilyModal, setShowFamilyModal] = useState(false);
-  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([
-    { id: 1, name: 'Rohan Sharma', relation: 'Son', phone: '+91 98765 43210' }
-  ]);
+  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [fmName, setFmName] = useState('');
   const [fmRelation, setFmRelation] = useState('Son');
   const [fmPhone, setFmPhone] = useState('');
