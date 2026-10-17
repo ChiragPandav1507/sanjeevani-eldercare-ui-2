@@ -12,20 +12,12 @@ interface Medicine {
 }
 
 interface MedicineCabinetScreenProps {
+  medicines: Medicine[];
+  setMedicines: React.Dispatch<React.SetStateAction<Medicine[]>>;
   onBack: () => void;
 }
 
-export function MedicineCabinetScreen({ onBack }: MedicineCabinetScreenProps) {
-  const [medicines, setMedicines] = useState<Medicine[]>([
-    {
-      id: '1',
-      name: '5545475',
-      dosage: '6',
-      time: '8:00 AM',
-      taken: false,
-    },
-  ]);
-
+export function MedicineCabinetScreen({ medicines, setMedicines, onBack }: MedicineCabinetScreenProps) {
   const [activeTab, setActiveTab] = useState<'current' | 'reminders'>('current');
   const [showAddForm, setShowAddForm] = useState(false);
   const [newName, setNewName] = useState('');
