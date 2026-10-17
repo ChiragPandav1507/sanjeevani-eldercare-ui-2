@@ -26,7 +26,7 @@ const SCREENS = [
   { id: '2A', label: '2A. Elder Reg' },
   { id: 3, label: '3. Visually Imp' },
   { id: 4, label: '4. Voice Reg' },
-  { id: 5, label: '5. Login' },
+  { id: 5, label: '5. Sign Up / Login' },
   { id: 6, label: '6. Dashboard' },
   { id: 8, label: '8. Scanner' },
   { id: 9, label: '9. AI Result' },
@@ -42,13 +42,15 @@ type ScreenId = 1 | '2A' | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
 
 export function ScreenSwitcher() {
   const [active, setActive] = useState<ScreenId>(1);
+  const [authMode, setAuthMode] = useState<'signup' | 'login'>('signup');
+
   useEffect(() => {
     const audioGuides: Record<string, string> = {
       '1': 'Namaste! Sanjeevani Elder Care mein aapka swagat hai.',
       '2A': 'Elder registration screen.',
       '3': 'Visually impaired registration screen.',
       '4': 'Voice form khul gaya hai.',
-      '5': 'Login screen.',
+      '5': authMode === 'signup' ? 'Create account screen.' : 'Login screen.',
       '6': 'Dashboard. Yahan aapki saari health details aur updates hain.',
       '8': 'Prescription scanner camera open ho gaya hai.',
       '9': 'Prescription result screen.',
@@ -73,14 +75,14 @@ export function ScreenSwitcher() {
 
       return () => clearTimeout(timer);
     }
-  }, [active]);
+  }, [active, authMode]);
+
   const [showDevPanel, setShowDevPanel] = useState(false);
   const [activeScanMode, setActiveScanMode] = useState<'prescription' | 'strip_expiry'>('strip_expiry');
   const [showAlarm, setShowAlarm] = useState(false);
   const [showFallModal, setShowFallModal] = useState(false);
   const [showVoiceSaathi, setShowVoiceSaathi] = useState(false);
 
-  // Fall sensor listener
   useEffect(() => {
     let lastZ = 0;
     const handleMotion = (event: DeviceMotionEvent) => {
@@ -107,10 +109,8 @@ export function ScreenSwitcher() {
   return (
     <TalkBackProvider>
       <div className="relative mx-auto flex min-h-screen max-w-md flex-col bg-slate-50 shadow-2xl border-x border-slate-200">
-        {/* Floating Top Bar (Test Controls) */}
         <div className="hidden sticky top-2 z-40 flex items-center justify-between px-3 pointer-events-none">
           <div className="flex items-center gap-1.5 pointer-events-auto">
-            {/* Voice Assistant Button */}
             <button
               type="button"
               onClick={() => setShowVoiceSaathi(true)}
@@ -121,7 +121,6 @@ export function ScreenSwitcher() {
               <span>Saathi</span>
             </button>
 
-            {/* Test Alarm Button */}
             <button
               type="button"
               onClick={() => setShowAlarm(true)}
@@ -131,7 +130,6 @@ export function ScreenSwitcher() {
               <span>Alarm</span>
             </button>
 
-            {/* Test Fall Button */}
             <button
               type="button"
               onClick={() => setShowFallModal(true)}
@@ -142,7 +140,6 @@ export function ScreenSwitcher() {
             </button>
           </div>
 
-          {/* Screen Switcher */}
           <button
             type="button"
             onClick={() => setShowDevPanel(!showDevPanel)}
@@ -154,7 +151,6 @@ export function ScreenSwitcher() {
           </button>
         </div>
 
-        {/* Collapsible Dropdown Grid */}
         {showDevPanel && (
           <div className="sticky top-11 z-40 mx-3 mb-2 rounded-2xl bg-slate-900/95 p-3 text-white shadow-2xl backdrop-blur-md border border-slate-700 space-y-2">
             <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 border-b border-slate-800 pb-1.5">
@@ -184,7 +180,6 @@ export function ScreenSwitcher() {
           </div>
         )}
 
-        {/* Screen Viewport */}
         <div className="flex-1">
           {active === 1 && (
             <WelcomeScreen
@@ -195,7 +190,10 @@ export function ScreenSwitcher() {
           {active === '2A' && (
             <ElderRegistrationScreen
               onBack={() => setActive(1)}
-              onNext={() => setActive(5)}
+              onNext={() => {
+                setAuthMode('signup');
+                setActive(5);
+              }}
             />
           )}
           {active === 3 && (
@@ -217,7 +215,7 @@ export function ScreenSwitcher() {
             <LoginScreen
               onLoginSuccess={() => setActive(6)}
               onContinueGuest={() => setActive(6)}
-              onGoToRegister={() => setActive('2A')}
+              onGoToRegister={() => setAuthMode(authMode === 'signup' ? 'login' : 'signup')}
             />
           )}
           {active === 6 && (
@@ -262,7 +260,6 @@ export function ScreenSwitcher() {
           )}
         </div>
 
-        {/* Live Medicine Audio Alarm */}
         {showAlarm && (
           <MedicineAlarmModal
             medicineName="Paracetamol 500 mg"
@@ -272,13 +269,11 @@ export function ScreenSwitcher() {
           />
         )}
 
-        {/* Live Fall Detection Emergency Modal */}
         <FallDetectionModal
           isOpen={showFallModal}
           onCancel={() => setShowFallModal(false)}
         />
 
-        {/* Live Voice Assistant Saathi Modal */}
         <VoiceAssistantModal
           isOpen={showVoiceSaathi}
           onClose={() => setShowVoiceSaathi(false)}
