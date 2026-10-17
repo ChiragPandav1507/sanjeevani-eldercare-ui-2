@@ -43,7 +43,7 @@ const SCREENS = [
 type ScreenId = 1 | '2A' | 3 | 4 | 5 | 16 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
 
 function ScreenSwitcherContent() {
-  const [active, setActive] = useState<ScreenId>(5);
+  const [active, setActive] = useState<ScreenId>(1);
   const { isEnabled } = useTalkBack();
 
   useEffect(() => {
@@ -190,7 +190,7 @@ function ScreenSwitcherContent() {
       <div className="flex-1">
         {active === 1 && (
           <WelcomeScreen
-            onSelectElderly={() => setActive('2A')}
+            onSelectElderly={() => setActive(5)}
             onSelectVisuallyImpaired={() => setActive(3)}
           />
         )}
@@ -205,7 +205,7 @@ function ScreenSwitcherContent() {
             onBack={() => setActive(1)}
             onContinue={(mode) => {
               if (mode === 'voice') setActive(4);
-              else setActive('2A');
+              else setActive(5);
             }}
           />
         )}
