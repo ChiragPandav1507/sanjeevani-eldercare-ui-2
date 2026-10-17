@@ -20,10 +20,10 @@ interface FamilyMember {
 export function ElderRegistrationScreen({ onBack, onNext }: ElderRegistrationScreenProps) {
   const [fullName, setFullName] = useState('');
   const [age, setAge] = useState('');
-  const [gender, setGender] = useState('female');
+  const [gender, setGender] = useState('');
   const [phone, setPhone] = useState('');
   const [city, setCity] = useState('');
-  const [medicalConditions, setMedicalConditions] = useState('Diabetes, High Blood Pressure');
+  const [medicalConditions, setMedicalConditions] = useState('');
   
   // Modal for Screen 2B
   const [showFamilyModal, setShowFamilyModal] = useState(false);
