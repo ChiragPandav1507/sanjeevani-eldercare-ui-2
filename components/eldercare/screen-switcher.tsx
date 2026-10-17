@@ -46,6 +46,11 @@ function ScreenSwitcherContent() {
   const [active, setActive] = useState<ScreenId>(1);
   const { isEnabled } = useTalkBack();
 
+  const [waterCount, setWaterCount] = useState<number>(0);
+  const [medicineCount, setMedicineCount] = useState<number>(0);
+  const [appointmentText, setAppointmentText] = useState<string>('Koi Appointment Nahi');
+  const [contactsCount, setContactsCount] = useState<number>(0);
+
   useEffect(() => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
@@ -231,6 +236,10 @@ function ScreenSwitcherContent() {
         )}
         {active === 6 && (
           <DashboardScreen
+            waterCount={waterCount}
+            medicineCount={medicineCount}
+            appointmentText={appointmentText}
+            contactsCount={contactsCount}
             onOpenVoice={() => setShowVoiceSaathi(true)}
             onNavigate={(id) => setActive(id)}
           />
@@ -248,7 +257,10 @@ function ScreenSwitcherContent() {
           <PrescriptionResultScreen
             scanMode={activeScanMode}
             onBack={() => setActive(8)}
-            onSaveToCabinet={() => setActive(10)}
+            onSaveToCabinet={() => {
+              setMedicineCount((prev) => prev + 1);
+              setActive(10);
+            }}
           />
         )}
         {active === 10 && (
@@ -258,7 +270,11 @@ function ScreenSwitcherContent() {
           <AppointmentsScreen onBack={() => setActive(6)} />
         )}
         {active === 12 && (
-          <WaterTrackerScreen onBack={() => setActive(6)} />
+          <WaterTrackerScreen
+            waterCount={waterCount}
+            setWaterCount={setWaterCount}
+            onBack={() => setActive(6)}
+          />
         )}
         {active === 13 && (
           <DailyWellbeingScreen onBack={() => setActive(6)} />
@@ -291,7 +307,7 @@ function ScreenSwitcherContent() {
         onActionTrigger={(action) => {
           if (action === 'SOS_TRIGGERED') setActive(15);
           if (action === 'MEDICINE_TAKEN') setActive(10);
-          if (action === 'WATER_ADDED') setActive(12);
+          if (action === 'WATER_ADDED') setWaterCount((prev) => Math.min(8, prev + 1));
         }}
       />
     </div>
