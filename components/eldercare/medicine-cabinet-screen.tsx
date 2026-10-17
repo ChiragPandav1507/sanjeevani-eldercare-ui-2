@@ -230,3 +230,13 @@ export function MedicineCabinetScreen({ onBack }: MedicineCabinetScreenProps) {
             )}
           </div>
         )}
+
+        {activeTab === 'reminders' && (
+          <div className="rounded-3xl border border-slate-200 bg-white p-4 text-center text-xs font-medium text-slate-500">
+            Daily medicine alerts are active.
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
