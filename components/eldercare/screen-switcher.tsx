@@ -48,7 +48,18 @@ function ScreenSwitcherContent() {
 
   const [language, setLanguage] = useState<string>('hi');
   const [waterCount, setWaterCount] = useState<number>(0);
-  const [medicineCount, setMedicineCount] = useState<number>(1);
+  
+  // Yahan medicines state hoist ki hai taaki data persist rahe
+  const [medicines, setMedicines] = useState<Array<{ id: string; name: string; dosage: string; time: string; taken: boolean }>>([
+    {
+      id: '1',
+      name: '5545475',
+      dosage: '6',
+      time: '8:00 AM',
+      taken: false,
+    },
+  ]);
+
   const [appointmentText, setAppointmentText] = useState<string>('Koi Appointment Nahi');
   const [contactsCount, setContactsCount] = useState<number>(0);
 
@@ -204,6 +215,7 @@ function ScreenSwitcherContent() {
         )}
         {active === '2A' && (
           <ElderRegistrationScreen
+            language={language}
             onBack={() => setActive(5)}
             onNext={() => setActive(6)}
           />
@@ -219,12 +231,14 @@ function ScreenSwitcherContent() {
         )}
         {active === 4 && (
           <VoiceFormScreen
+            language={language}
             onBack={() => setActive(3)}
             onSubmitSuccess={() => setActive(6)}
           />
         )}
         {active === 5 && (
           <LoginScreen
+            language={language}
             onLoginSuccess={() => setActive('2A')}
             onContinueGuest={() => setActive('2A')}
             onGoToRegister={() => setActive(16)}
@@ -232,6 +246,7 @@ function ScreenSwitcherContent() {
         )}
         {active === 16 && (
           <ActualLoginScreen
+            language={language}
             onLoginSuccess={() => setActive(6)}
             onContinueGuest={() => setActive(6)}
             onGoToRegister={() => setActive(5)}
@@ -241,7 +256,7 @@ function ScreenSwitcherContent() {
           <DashboardScreen
             language={language}
             waterCount={waterCount}
-            medicineCount={medicineCount}
+            medicineCount={medicines.length}
             appointmentText={appointmentText}
             contactsCount={contactsCount}
             onOpenVoice={() => setShowVoiceSaathi(true)}
@@ -262,13 +277,16 @@ function ScreenSwitcherContent() {
             scanMode={activeScanMode}
             onBack={() => setActive(8)}
             onSaveToCabinet={() => {
-              setMedicineCount((prev) => prev + 1);
               setActive(10);
             }}
           />
         )}
         {active === 10 && (
-          <MedicineCabinetScreen onBack={() => setActive(6)} />
+          <MedicineCabinetScreen
+            medicines={medicines}
+            setMedicines={setMedicines}
+            onBack={() => setActive(6)}
+          />
         )}
         {active === 11 && (
           <AppointmentsScreen onBack={() => setActive(6)} />
@@ -311,17 +329,4 @@ function ScreenSwitcherContent() {
         onActionTrigger={(action) => {
           if (action === 'SOS_TRIGGERED') setActive(15);
           if (action === 'MEDICINE_TAKEN') setActive(10);
-          if (action === 'WATER_ADDED') setWaterCount((prev) => Math.min(8, prev + 1));
-        }}
-      />
-    </div>
-  );
-}
-
-export function ScreenSwitcher() {
-  return (
-    <TalkBackProvider>
-      <ScreenSwitcherContent />
-    </TalkBackProvider>
-  );
-}
+          if (action === 'WATER_ADDED') setWaterCount((
