@@ -26,6 +26,7 @@ import { MedicineCabinetScreen } from './medicine-cabinet-screen';
 import {
   AppointmentsScreen,
   INITIAL_APPOINTMENTS,
+  getAppointmentStatus,
   type AppointmentItem,
 } from './appointments-screen';
 import { WaterTrackerScreen } from './water-tracker-screen';
@@ -239,7 +240,7 @@ function ScreenSwitcherContent({
   }, [emergencyContacts, contactsLoaded]);
 
   const upcomingAppointmentCount = appointments.filter(
-    (appointment) => appointment.status === 'upcoming'
+    (appointment) => getAppointmentStatus(appointment) === 'upcoming'
   ).length;
 
   const appointmentCopy =
@@ -502,6 +503,7 @@ function ScreenSwitcherContent({
 
         {active === 11 && (
           <AppointmentsScreen
+            language={language}
             appointments={appointments}
             setAppointments={setAppointments}
             onBack={() => setActive(6)}
