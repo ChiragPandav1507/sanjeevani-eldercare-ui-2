@@ -145,10 +145,10 @@ export function LoginScreen({
 
       <main className="flex-1 max-w-md mx-auto w-full px-5 pt-8 space-y-6">
         <div className="text-center space-y-1">
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-            {t.title}
-          </h2>
-          <p className="text-xs text-slate-500 font-medium">{t.subtitle}</p>
+          <h2 className="text-2xl font-black text-slate-900 tracking-tight">Create Account</h2>
+          <p className="text-xs text-slate-500 font-medium">
+            Sign up for your Sanjeevani account to stay healthy and connected
+          </p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4 pt-2">
@@ -177,18 +177,13 @@ export function LoginScreen({
           </div>
 
           <div>
-            <label
-              htmlFor="signup-password"
-              className="block text-xs font-bold text-slate-700 mb-1"
-            >
-              {t.labelPass}
-            </label>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Set Password</label>
             <div className="relative">
               <input
                 id="signup-password"
                 type={showPassword ? 'text' : 'password'}
                 required
-                placeholder={t.placeholderPass}
+                placeholder="Create password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 pr-11 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-xs"
@@ -212,7 +207,7 @@ export function LoginScreen({
             type="submit"
             className="w-full rounded-xl bg-emerald-600 py-3 text-sm font-bold text-white shadow-md transition-colors hover:bg-emerald-700 active:scale-[0.99]"
           >
-            {t.signUp}
+            Sign Up
           </button>
         </form>
 
@@ -231,16 +226,18 @@ export function LoginScreen({
           {t.guest}
         </button>
 
-        <p className="text-center text-xs text-slate-500">
-          {t.hasAccount}{' '}
-          <button
-            type="button"
-            onClick={onGoToRegister}
-            className="font-bold text-emerald-700 hover:text-emerald-800"
-          >
-            {t.loginLink}
-          </button>
-        </p>
+        <div className="text-center pt-2">
+          <p className="text-xs text-slate-500">
+            Already have an account?{' '}
+            <button
+              type="button"
+              onClick={onGoToRegister}
+              className="font-bold text-emerald-700 hover:underline"
+            >
+              Login here
+            </button>
+          </p>
+        </div>
       </main>
     </div>
   );

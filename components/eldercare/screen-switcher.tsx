@@ -26,7 +26,6 @@ import { MedicineCabinetScreen } from './medicine-cabinet-screen';
 import {
   AppointmentsScreen,
   INITIAL_APPOINTMENTS,
-  getAppointmentStatus,
   type AppointmentItem,
 } from './appointments-screen';
 import { WaterTrackerScreen } from './water-tracker-screen';
@@ -72,117 +71,12 @@ type ScreenId =
   | 14
   | 15;
 
-const FAMILY_HUB_STORAGE_KEY = 'sanjeevani-family-hub';
-
-const AUDIO_GUIDES: Record<string, Record<string, string>> = {
-  en: {
-    '1': 'Welcome to Sanjeevani Elder Care.',
-    '2A': 'Elder registration screen.',
-    '3': 'Visually impaired registration screen.',
-    '4': 'Voice setup screen.',
-    '5': 'Account creation screen.',
-    '16': 'Login screen.',
-    '6': 'Dashboard. Your health details and updates are here.',
-    '8': 'Prescription scanner camera is open.',
-    '9': 'Prescription results screen.',
-    '10': 'Medicine cabinet screen.',
-    '11': 'Doctor appointments screen.',
-    '12': 'Water tracker screen.',
-    '13': 'Daily wellbeing screen.',
-    '14': 'Family hub screen.',
-    '15': 'Emergency SOS screen.',
-  },
-  hi: {
-    '1': 'संजीवनी एल्डर केयर में आपका स्वागत है।',
-    '2A': 'बुजुर्ग पंजीकरण स्क्रीन।',
-    '3': 'दृष्टिबाधित पंजीकरण स्क्रीन।',
-    '4': 'वॉइस सेटअप स्क्रीन।',
-    '5': 'खाता बनाने की स्क्रीन।',
-    '16': 'लॉगिन स्क्रीन।',
-    '6': 'डैशबोर्ड। यहाँ आपकी स्वास्थ्य जानकारी और अपडेट हैं।',
-    '8': 'पर्चा स्कैन करने का कैमरा खुल गया है।',
-    '9': 'पर्चे के परिणाम की स्क्रीन।',
-    '10': 'दवा अलमारी की स्क्रीन।',
-    '11': 'डॉक्टर अपॉइंटमेंट की स्क्रीन।',
-    '12': 'पानी ट्रैकर की स्क्रीन।',
-    '13': 'दैनिक स्वास्थ्य की स्क्रीन।',
-    '14': 'परिवार केंद्र की स्क्रीन।',
-    '15': 'आपातकालीन सहायता स्क्रीन।',
-  },
-  mr: {
-    '1': 'संजीवनी एल्डर केअरमध्ये तुमचे स्वागत आहे.',
-    '2A': 'ज्येष्ठ नोंदणी स्क्रीन.',
-    '3': 'दृष्टिहीन नोंदणी स्क्रीन.',
-    '4': 'व्हॉइस सेटअप स्क्रीन.',
-    '5': 'खाते तयार करण्याची स्क्रीन.',
-    '16': 'लॉगिन स्क्रीन.',
-    '6': 'डॅशबोर्ड. येथे तुमची आरोग्य माहिती आणि अपडेट्स आहेत.',
-    '8': 'प्रिस्क्रिप्शन स्कॅनर कॅमेरा सुरू आहे.',
-    '9': 'प्रिस्क्रिप्शन निकालांची स्क्रीन.',
-    '10': 'औषध कपाटाची स्क्रीन.',
-    '11': 'डॉक्टरांच्या भेटींची स्क्रीन.',
-    '12': 'पाणी ट्रॅकरची स्क्रीन.',
-    '13': 'दैनिक आरोग्याची स्क्रीन.',
-    '14': 'कुटुंब केंद्राची स्क्रीन.',
-    '15': 'आपत्कालीन मदत स्क्रीन.',
-  },
-  bn: {
-    '1': 'সঞ্জীবনী এল্ডার কেয়ারে আপনাকে স্বাগতম।',
-    '2A': 'প্রবীণ নিবন্ধন স্ক্রিন।',
-    '3': 'দৃষ্টিপ্রতিবন্ধী নিবন্ধন স্ক্রিন।',
-    '4': 'ভয়েস সেটআপ স্ক্রিন।',
-    '5': 'অ্যাকাউন্ট তৈরির স্ক্রিন।',
-    '16': 'লগইন স্ক্রিন।',
-    '6': 'ড্যাশবোর্ড। এখানে আপনার স্বাস্থ্য তথ্য ও আপডেট আছে।',
-    '8': 'প্রেসক্রিপশন স্ক্যানারের ক্যামেরা চালু হয়েছে।',
-    '9': 'প্রেসক্রিপশন ফলাফলের স্ক্রিন।',
-    '10': 'ওষুধের ক্যাবিনেট স্ক্রিন।',
-    '11': 'ডাক্তারের অ্যাপয়েন্টমেন্ট স্ক্রিন।',
-    '12': 'জল ট্র্যাকার স্ক্রিন।',
-    '13': 'দৈনিক সুস্থতার স্ক্রিন।',
-    '14': 'পরিবার কেন্দ্রের স্ক্রিন।',
-    '15': 'জরুরি সহায়তার স্ক্রিন।',
-  },
-};
-
-const APPOINTMENT_SUMMARY: Record<
-  string,
-  { none: string; one: string; many: string }
-> = {
-  en: {
-    none: 'No Appointments',
-    one: '1 Upcoming Appointment',
-    many: '{count} Upcoming Appointments',
-  },
-  hi: {
-    none: 'कोई अपॉइंटमेंट नहीं',
-    one: '1 आगामी अपॉइंटमेंट',
-    many: '{count} आगामी अपॉइंटमेंट',
-  },
-  mr: {
-    none: 'कोणतीही अपॉइंटमेंट नाही',
-    one: '१ आगामी अपॉइंटमेंट',
-    many: '{count} आगामी अपॉइंटमेंट',
-  },
-  bn: {
-    none: 'কোনো অ্যাপয়েন্টমেন্ট নেই',
-    one: '১টি আসন্ন অ্যাপয়েন্টমেন্ট',
-    many: '{count}টি আসন্ন অ্যাপয়েন্টমেন্ট',
-  },
-};
-
-function ScreenSwitcherContent({
-  language,
-  setLanguage,
-}: {
-  language: string;
-  setLanguage: (language: string) => void;
-}) {
+function ScreenSwitcherContent() {
   const [active, setActive] = useState<ScreenId>(1);
   const { isEnabled } = useTalkBack();
 
+  const [language, setLanguage] = useState<string>('hi');
   const [waterCount, setWaterCount] = useState<number>(0);
-  const [recognizedText, setRecognizedText] = useState('');
 
   const [medicines, setMedicines] = useState<
     Array<{
@@ -204,57 +98,18 @@ function ScreenSwitcherContent({
 
   const [appointments, setAppointments] =
     useState<AppointmentItem[]>(INITIAL_APPOINTMENTS);
-  const [emergencyContacts, setEmergencyContacts] = useState<
-    EmergencyContact[]
-  >([]);
-  const [contactsLoaded, setContactsLoaded] = useState(false);
-
-  useEffect(() => {
-    try {
-      const savedData = localStorage.getItem(FAMILY_HUB_STORAGE_KEY);
-
-      if (savedData) {
-        const parsed = JSON.parse(savedData);
-        if (Array.isArray(parsed.emergencyContacts)) {
-          setEmergencyContacts(parsed.emergencyContacts);
-        }
-      }
-    } catch (error) {
-      console.error('Could not load emergency contacts:', error);
-    } finally {
-      setContactsLoaded(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!contactsLoaded) return;
-
-    try {
-      localStorage.setItem(
-        FAMILY_HUB_STORAGE_KEY,
-        JSON.stringify({ emergencyContacts })
-      );
-    } catch (error) {
-      console.error('Could not save emergency contacts:', error);
-    }
-  }, [emergencyContacts, contactsLoaded]);
+  const [contactsCount, setContactsCount] = useState<number>(0);
 
   const upcomingAppointmentCount = appointments.filter(
-    (appointment) => getAppointmentStatus(appointment) === 'upcoming'
+    (appointment) => appointment.status === 'upcoming'
   ).length;
-
-  const appointmentCopy =
-    APPOINTMENT_SUMMARY[language] ?? APPOINTMENT_SUMMARY.hi;
 
   const appointmentText =
     upcomingAppointmentCount === 0
-      ? appointmentCopy.none
-      : upcomingAppointmentCount === 1
-        ? appointmentCopy.one
-        : appointmentCopy.many.replace(
-            '{count}',
-            String(upcomingAppointmentCount)
-          );
+      ? 'Koi Appointment Nahi'
+      : `${upcomingAppointmentCount} Upcoming ${
+          upcomingAppointmentCount === 1 ? 'Appointment' : 'Appointments'
+        }`;
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -263,24 +118,33 @@ function ScreenSwitcherContent({
 
     if (!isEnabled) return;
 
-    const message =
-      AUDIO_GUIDES[language]?.[String(active)] ??
-      AUDIO_GUIDES.hi[String(active)];
+    const audioGuides: Record<string, string> = {
+      '1': 'Namaste! Sanjeevani Elder Care mein aapka swagat hai.',
+      '2A': 'Elder registration screen.',
+      '3': 'Visually impaired registration screen.',
+      '4': 'Voice form khul gaya hai.',
+      '5': 'Account creation screen.',
+      '16': 'Login screen.',
+      '6': 'Dashboard. Yahan aapki saari health details aur updates hain.',
+      '8': 'Prescription scanner camera open ho gaya hai.',
+      '9': 'Prescription result screen.',
+      '10': 'Medicine cabinet screen.',
+      '11': 'Doctor appointments screen.',
+      '12': 'Water tracker screen.',
+      '13': 'Daily wellbeing screen.',
+      '14': 'Family hub khul gaya hai.',
+      '15': 'Emergency SOS screen.',
+    };
+
+    const message = audioGuides[String(active)];
 
     if (
       message &&
       typeof window !== 'undefined' &&
       'speechSynthesis' in window
     ) {
-      const locale: Record<string, string> = {
-        en: 'en-IN',
-        hi: 'hi-IN',
-        mr: 'mr-IN',
-        bn: 'bn-IN',
-      };
-
       const utterance = new SpeechSynthesisUtterance(message);
-      utterance.lang = locale[language] ?? 'hi-IN';
+      utterance.lang = language === 'en' ? 'en-US' : 'hi-IN';
       utterance.rate = 0.9;
 
       const timer = setTimeout(() => {
@@ -309,7 +173,9 @@ function ScreenSwitcherContent({
       const deltaZ = Math.abs((acc.z || 0) - lastZ);
       lastZ = acc.z || 0;
 
-      if (deltaZ > 25) setShowFallModal(true);
+      if (deltaZ > 25) {
+        setShowFallModal(true);
+      }
     };
 
     if (typeof window !== 'undefined' && 'DeviceMotionEvent' in window) {
@@ -379,21 +245,21 @@ function ScreenSwitcherContent({
           </div>
 
           <div className="grid grid-cols-2 gap-1.5 max-h-60 overflow-y-auto pr-1">
-            {SCREENS.map((screen) => (
+            {SCREENS.map((s) => (
               <button
-                key={screen.id}
+                key={s.id}
                 type="button"
                 onClick={() => {
-                  setActive(screen.id as ScreenId);
+                  setActive(s.id as ScreenId);
                   setShowDevPanel(false);
                 }}
                 className={`rounded-xl px-2.5 py-1.5 text-left text-[11px] font-semibold transition-all ${
-                  active === screen.id
+                  active === s.id
                     ? 'bg-emerald-600 text-white font-bold shadow-xs'
                     : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white'
                 }`}
               >
-                {screen.label}
+                {s.label}
               </button>
             ))}
           </div>
@@ -420,7 +286,6 @@ function ScreenSwitcherContent({
 
         {active === 3 && (
           <VisuallyImpairedRegistrationScreen
-            language={language}
             onBack={() => setActive(1)}
             onContinue={(mode) => {
               if (mode === 'voice') setActive(4);
@@ -461,12 +326,9 @@ function ScreenSwitcherContent({
             waterCount={waterCount}
             medicineCount={medicines.length}
             appointmentText={appointmentText}
-            contactsCount={emergencyContacts.length}
+            contactsCount={contactsCount}
             onOpenVoice={() => setShowVoiceSaathi(true)}
-            onNavigate={(id) => {
-              if (id === 8) setRecognizedText('');
-              setActive(id);
-            }}
+            onNavigate={(id) => setActive(id)}
           />
         )}
 
@@ -474,9 +336,8 @@ function ScreenSwitcherContent({
           <PrescriptionScannerScreen
             language={language}
             onBack={() => setActive(6)}
-            onScanComplete={(mode, text) => {
+            onScanComplete={(mode) => {
               setActiveScanMode(mode);
-              setRecognizedText(text);
               setActive(9);
             }}
           />
@@ -486,9 +347,10 @@ function ScreenSwitcherContent({
           <PrescriptionResultScreen
             language={language}
             scanMode={activeScanMode}
-            recognizedText={recognizedText}
             onBack={() => setActive(8)}
-            onSaveToCabinet={() => setActive(10)}
+            onSaveToCabinet={() => {
+              setActive(10);
+            }}
           />
         )}
 
@@ -503,7 +365,6 @@ function ScreenSwitcherContent({
 
         {active === 11 && (
           <AppointmentsScreen
-            language={language}
             appointments={appointments}
             setAppointments={setAppointments}
             onBack={() => setActive(6)}
@@ -529,8 +390,6 @@ function ScreenSwitcherContent({
         {active === 14 && (
           <FamilyHubScreen
             language={language}
-            emergencyContacts={emergencyContacts}
-            setEmergencyContacts={setEmergencyContacts}
             onBack={() => setActive(6)}
           />
         )}
@@ -564,7 +423,7 @@ function ScreenSwitcherContent({
           if (action === 'SOS_TRIGGERED') setActive(15);
           if (action === 'MEDICINE_TAKEN') setActive(10);
           if (action === 'WATER_ADDED') {
-            setWaterCount((previous) => previous + 1);
+            setWaterCount((prev) => prev + 1);
           }
         }}
       />
@@ -573,14 +432,9 @@ function ScreenSwitcherContent({
 }
 
 export function ScreenSwitcher() {
-  const [language, setLanguage] = useState('hi');
-
   return (
-    <TalkBackProvider language={language}>
-      <ScreenSwitcherContent
-        language={language}
-        setLanguage={setLanguage}
-      />
+    <TalkBackProvider>
+      <ScreenSwitcherContent />
     </TalkBackProvider>
   );
 }
