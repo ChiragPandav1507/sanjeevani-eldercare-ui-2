@@ -25,13 +25,98 @@ interface FamilyHubScreenProps {
   >;
 }
 
+const COPY: Record<
+  string,
+  {
+    back: string;
+    title: string;
+    heading: string;
+    namePlaceholder: string;
+    contactName: string;
+    relationshipPlaceholder: string;
+    relationship: string;
+    phonePlaceholder: string;
+    phoneNumber: string;
+    addContact: string;
+    callContact: string;
+    whatsappMessage: string;
+    deleteContact: string;
+    empty: string;
+  }
+> = {
+  en: {
+    back: 'Go back',
+    title: 'Family Hub',
+    heading: 'Emergency Contacts',
+    namePlaceholder: 'Name',
+    contactName: 'Contact name',
+    relationshipPlaceholder: 'Relationship (e.g. Daughter)',
+    relationship: 'Relationship',
+    phonePlaceholder: 'Phone number',
+    phoneNumber: 'Phone number',
+    addContact: 'Add Emergency Contact',
+    callContact: 'Call contact',
+    whatsappMessage: 'Message contact on WhatsApp',
+    deleteContact: 'Delete contact',
+    empty: 'No emergency contacts added yet.',
+  },
+  hi: {
+    back: 'वापस जाएँ',
+    title: 'परिवार केंद्र',
+    heading: 'आपातकालीन संपर्क',
+    namePlaceholder: 'नाम',
+    contactName: 'संपर्क का नाम',
+    relationshipPlaceholder: 'रिश्ता (जैसे: बेटी)',
+    relationship: 'रिश्ता',
+    phonePlaceholder: 'फ़ोन नंबर',
+    phoneNumber: 'फ़ोन नंबर',
+    addContact: 'आपातकालीन संपर्क जोड़ें',
+    callContact: 'संपर्क को कॉल करें',
+    whatsappMessage: 'WhatsApp पर संदेश भेजें',
+    deleteContact: 'संपर्क हटाएँ',
+    empty: 'अभी तक कोई आपातकालीन संपर्क नहीं जोड़ा गया है।',
+  },
+  mr: {
+    back: 'मागे जा',
+    title: 'कुटुंब केंद्र',
+    heading: 'आपत्कालीन संपर्क',
+    namePlaceholder: 'नाव',
+    contactName: 'संपर्काचे नाव',
+    relationshipPlaceholder: 'नाते (उदा. मुलगी)',
+    relationship: 'नाते',
+    phonePlaceholder: 'फोन नंबर',
+    phoneNumber: 'फोन नंबर',
+    addContact: 'आपत्कालीन संपर्क जोडा',
+    callContact: 'संपर्काला कॉल करा',
+    whatsappMessage: 'WhatsApp वर संदेश पाठवा',
+    deleteContact: 'संपर्क हटवा',
+    empty: 'अद्याप कोणताही आपत्कालीन संपर्क जोडलेला नाही.',
+  },
+  bn: {
+    back: 'ফিরে যান',
+    title: 'পরিবার কেন্দ্র',
+    heading: 'জরুরি যোগাযোগ',
+    namePlaceholder: 'নাম',
+    contactName: 'যোগাযোগের নাম',
+    relationshipPlaceholder: 'সম্পর্ক (যেমন: মেয়ে)',
+    relationship: 'সম্পর্ক',
+    phonePlaceholder: 'ফোন নম্বর',
+    phoneNumber: 'ফোন নম্বর',
+    addContact: 'জরুরি যোগাযোগ যোগ করুন',
+    callContact: 'যোগাযোগকে কল করুন',
+    whatsappMessage: 'WhatsApp-এ বার্তা পাঠান',
+    deleteContact: 'যোগাযোগ মুছুন',
+    empty: 'এখনও কোনো জরুরি যোগাযোগ যোগ করা হয়নি।',
+  },
+};
+
 export function FamilyHubScreen({
   onBack,
   language,
   emergencyContacts,
   setEmergencyContacts,
 }: FamilyHubScreenProps) {
-  const isEn = language === 'en';
+  const t = COPY[language] ?? COPY.hi;
 
   const [contactName, setContactName] = useState('');
   const [contactRole, setContactRole] = useState('');
@@ -72,14 +157,14 @@ export function FamilyHubScreen({
         <button
           type="button"
           onClick={onBack}
-          aria-label={isEn ? 'Go back' : 'वापस जाएँ'}
+          aria-label={t.back}
           className="flex size-9 items-center justify-center rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 active:scale-95 transition-all"
         >
           <ArrowLeft className="size-5" />
         </button>
 
         <h1 className="text-base font-black text-slate-900 tracking-tight">
-          {isEn ? 'Family Hub' : 'परिवार केंद्र'}
+          {t.title}
         </h1>
 
         <div className="size-9" />
@@ -88,7 +173,7 @@ export function FamilyHubScreen({
       <main className="flex-1 max-w-md mx-auto w-full px-4 pt-5 space-y-4">
         <section className="space-y-3">
           <h2 className="text-xs font-black uppercase tracking-wider text-slate-500 px-1">
-            {isEn ? 'Emergency Contacts' : 'आपातकालीन संपर्क'}
+            {t.heading}
           </h2>
 
           <form
@@ -100,8 +185,8 @@ export function FamilyHubScreen({
               required
               value={contactName}
               onChange={(event) => setContactName(event.target.value)}
-              placeholder={isEn ? 'Name' : 'नाम'}
-              aria-label={isEn ? 'Contact name' : 'संपर्क का नाम'}
+              placeholder={t.namePlaceholder}
+              aria-label={t.contactName}
               className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
 
@@ -109,10 +194,8 @@ export function FamilyHubScreen({
               type="text"
               value={contactRole}
               onChange={(event) => setContactRole(event.target.value)}
-              placeholder={
-                isEn ? 'Relationship (e.g. Daughter)' : 'रिश्ता (जैसे: बेटी)'
-              }
-              aria-label={isEn ? 'Relationship' : 'रिश्ता'}
+              placeholder={t.relationshipPlaceholder}
+              aria-label={t.relationship}
               className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
 
@@ -121,8 +204,8 @@ export function FamilyHubScreen({
               required
               value={contactPhone}
               onChange={(event) => setContactPhone(event.target.value)}
-              placeholder={isEn ? 'Phone number' : 'फ़ोन नंबर'}
-              aria-label={isEn ? 'Phone number' : 'फ़ोन नंबर'}
+              placeholder={t.phonePlaceholder}
+              aria-label={t.phoneNumber}
               className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
 
@@ -132,7 +215,7 @@ export function FamilyHubScreen({
               className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-emerald-700 py-2.5 text-xs font-bold text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Plus className="size-4" />
-              {isEn ? 'Add Emergency Contact' : 'आपातकालीन संपर्क जोड़ें'}
+              {t.addContact}
             </button>
           </form>
 
@@ -165,9 +248,7 @@ export function FamilyHubScreen({
                     <div className="flex shrink-0 items-center gap-2">
                       <a
                         href={`tel:${contact.phone}`}
-                        aria-label={
-                          isEn ? 'Call contact' : 'संपर्क को कॉल करें'
-                        }
+                        aria-label={t.callContact}
                         className="flex size-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
                       >
                         <Phone className="size-4" />
@@ -177,11 +258,7 @@ export function FamilyHubScreen({
                         href={`https://wa.me/${whatsappNumber}`}
                         target="_blank"
                         rel="noreferrer"
-                        aria-label={
-                          isEn
-                            ? 'Message contact on WhatsApp'
-                            : 'WhatsApp पर संदेश भेजें'
-                        }
+                        aria-label={t.whatsappMessage}
                         className="flex size-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
                       >
                         <MessageSquare className="size-4" />
@@ -190,8 +267,8 @@ export function FamilyHubScreen({
                       <button
                         type="button"
                         onClick={() => handleDeleteContact(contact.id)}
-                        aria-label={isEn ? 'Delete contact' : 'संपर्क हटाएँ'}
-                        title={isEn ? 'Delete contact' : 'संपर्क हटाएँ'}
+                        aria-label={t.deleteContact}
+                        title={t.deleteContact}
                         className="flex size-8 items-center justify-center rounded-xl bg-red-50 text-red-600 hover:bg-red-100"
                       >
                         <Trash2 className="size-4" />
@@ -203,9 +280,7 @@ export function FamilyHubScreen({
             </div>
           ) : (
             <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center text-xs text-slate-400 font-medium">
-              {isEn
-                ? 'No emergency contacts added yet.'
-                : 'अभी तक कोई आपातकालीन संपर्क नहीं जोड़ा गया है।'}
+              {t.empty}
             </div>
           )}
         </section>
