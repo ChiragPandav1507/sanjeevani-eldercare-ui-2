@@ -369,7 +369,10 @@ function ScreenSwitcherContent() {
         )}
 
         {active === 13 && (
-          <DailyWellbeingScreen onBack={() => setActive(6)} />
+          <DailyWellbeingScreen
+            language={language}
+            onBack={() => setActive(6)}
+          />
         )}
 
         {active === 14 && (
