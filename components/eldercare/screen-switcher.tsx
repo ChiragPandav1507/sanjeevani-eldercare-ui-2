@@ -44,7 +44,22 @@ const SCREENS = [
   { id: 15, label: '15. SOS' },
 ] as const;
 
-type ScreenId = 1 | '2A' | 3 | 4 | 5 | 16 | 6 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
+type ScreenId =
+  | 1
+  | '2A'
+  | 3
+  | 4
+  | 5
+  | 16
+  | 6
+  | 8
+  | 9
+  | 10
+  | 11
+  | 12
+  | 13
+  | 14
+  | 15;
 
 function ScreenSwitcherContent() {
   const [active, setActive] = useState<ScreenId>(1);
@@ -345,6 +360,7 @@ function ScreenSwitcherContent() {
 
         {active === 12 && (
           <WaterTrackerScreen
+            language={language}
             waterCount={waterCount}
             setWaterCount={setWaterCount}
             onBack={() => setActive(6)}
