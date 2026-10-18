@@ -10,6 +10,107 @@ interface ActualLoginScreenProps {
   onContinueGuest: () => void;
 }
 
+const COPY: Record<
+  string,
+  {
+    title: string;
+    subtitle: string;
+    labelId: string;
+    placeholderId: string;
+    labelPass: string;
+    placeholderPass: string;
+    remember: string;
+    forgot: string;
+    login: string;
+    showPassword: string;
+    hidePassword: string;
+    or: string;
+    guest: string;
+    newUser: string;
+    registerLink: string;
+    alertMsg: string;
+  }
+> = {
+  en: {
+    title: 'Welcome Back!',
+    subtitle:
+      'Login to your Sanjeevani account to stay healthy and connected',
+    labelId: 'Mobile Number or Email',
+    placeholderId: 'Enter mobile number or email',
+    labelPass: 'Password',
+    placeholderPass: 'Enter password',
+    remember: 'Remember me',
+    forgot: 'Forgot password?',
+    login: 'Login',
+    showPassword: 'Show password',
+    hidePassword: 'Hide password',
+    or: 'OR',
+    guest: 'Continue as Guest',
+    newUser: 'New user?',
+    registerLink: 'Register here',
+    alertMsg: 'OTP reset link sent to your registered mobile number.',
+  },
+  hi: {
+    title: 'वापसी पर स्वागत है!',
+    subtitle: 'स्वस्थ और जुड़े रहने के लिए अपने संजीवनी खाते में लॉगिन करें',
+    labelId: 'मोबाइल नंबर या ईमेल',
+    placeholderId: 'मोबाइल नंबर या ईमेल दर्ज करें',
+    labelPass: 'पासवर्ड',
+    placeholderPass: 'पासवर्ड दर्ज करें',
+    remember: 'मुझे याद रखें',
+    forgot: 'पासवर्ड भूल गए?',
+    login: 'लॉगिन करें',
+    showPassword: 'पासवर्ड दिखाएँ',
+    hidePassword: 'पासवर्ड छिपाएँ',
+    or: 'या',
+    guest: 'गेस्ट के रूप में जारी रखें',
+    newUser: 'नया उपयोगकर्ता?',
+    registerLink: 'यहाँ रजिस्टर करें',
+    alertMsg:
+      'आपके पंजीकृत मोबाइल नंबर पर ओटीपी रीसेट लिंक भेज दिया गया है।',
+  },
+  mr: {
+    title: 'पुन्हा स्वागत आहे!',
+    subtitle:
+      'निरोगी आणि संपर्कात राहण्यासाठी तुमच्या संजीवनी खात्यात लॉगिन करा',
+    labelId: 'मोबाइल नंबर किंवा ईमेल',
+    placeholderId: 'मोबाइल नंबर किंवा ईमेल टाका',
+    labelPass: 'पासवर्ड',
+    placeholderPass: 'पासवर्ड टाका',
+    remember: 'मला लक्षात ठेवा',
+    forgot: 'पासवर्ड विसरलात?',
+    login: 'लॉगिन करा',
+    showPassword: 'पासवर्ड दाखवा',
+    hidePassword: 'पासवर्ड लपवा',
+    or: 'किंवा',
+    guest: 'पाहुणे म्हणून पुढे जा',
+    newUser: 'नवीन वापरकर्ता?',
+    registerLink: 'येथे नोंदणी करा',
+    alertMsg:
+      'तुमच्या नोंदणीकृत मोबाइल नंबरवर ओटीपी रीसेट लिंक पाठवली आहे.',
+  },
+  bn: {
+    title: 'আবার স্বাগতম!',
+    subtitle:
+      'সুস্থ ও সংযুক্ত থাকতে আপনার সঞ্জীবনী অ্যাকাউন্টে লগইন করুন',
+    labelId: 'মোবাইল নম্বর বা ইমেল',
+    placeholderId: 'মোবাইল নম্বর বা ইমেল লিখুন',
+    labelPass: 'পাসওয়ার্ড',
+    placeholderPass: 'পাসওয়ার্ড লিখুন',
+    remember: 'আমাকে মনে রাখুন',
+    forgot: 'পাসওয়ার্ড ভুলে গেছেন?',
+    login: 'লগইন করুন',
+    showPassword: 'পাসওয়ার্ড দেখান',
+    hidePassword: 'পাসওয়ার্ড লুকান',
+    or: 'অথবা',
+    guest: 'অতিথি হিসেবে চালিয়ে যান',
+    newUser: 'নতুন ব্যবহারকারী?',
+    registerLink: 'এখানে নিবন্ধন করুন',
+    alertMsg:
+      'আপনার নিবন্ধিত মোবাইল নম্বরে OTP রিসেট লিংক পাঠানো হয়েছে।',
+  },
+};
+
 export function ActualLoginScreen({
   language,
   onLoginSuccess,
@@ -21,44 +122,10 @@ export function ActualLoginScreen({
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
 
-  const isEn = language === 'en';
+  const t = COPY[language] ?? COPY.hi;
 
-  const t = isEn
-    ? {
-        title: 'Welcome Back!',
-        subtitle: 'Login to your Sanjeevani account to stay healthy and connected',
-        labelId: 'Mobile Number or Email',
-        placeholderId: 'Enter mobile number or email',
-        labelPass: 'Password',
-        placeholderPass: 'Enter password',
-        remember: 'Remember me',
-        forgot: 'Forgot password?',
-        login: 'Login',
-        or: 'OR',
-        guest: 'Continue as Guest',
-        newUser: 'New user?',
-        registerLink: 'Register here',
-        alertMsg: 'OTP reset link sent to your registered mobile number.',
-      }
-    : {
-        title: 'वापसी पर स्वागत है!',
-        subtitle: 'स्वस्थ और जुड़े रहने के लिए अपने संजीवनी खाते में लॉगिन करें',
-        labelId: 'मोबाइल नंबर या ईमेल',
-        placeholderId: 'मोबाइल नंबर या ईमेल दर्ज करें',
-        labelPass: 'पासवर्ड',
-        placeholderPass: 'पासवर्ड दर्ज करें',
-        remember: 'मुझे याद रखें',
-        forgot: 'पासवर्ड भूल गए?',
-        login: 'लॉगिन करें',
-        or: 'या',
-        guest: 'गेस्ट के रूप में जारी रखें',
-        newUser: 'नया उपयोगकर्ता?',
-        registerLink: 'यहाँ रजिस्टर करें',
-        alertMsg: 'आपके पंजीकृत मोबाइल नंबर पर ओटीपी रीसेट लिंक भेज दिया गया है।',
-      };
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!identifier.trim() || !password.trim()) return;
 
     try {
@@ -66,8 +133,8 @@ export function ActualLoginScreen({
         'user_session',
         JSON.stringify({ user: identifier, loggedInAt: Date.now() })
       );
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
     }
 
     onLoginSuccess();
@@ -81,55 +148,77 @@ export function ActualLoginScreen({
             <Heart className="size-5 fill-current" />
           </div>
           <div>
-            <h1 className="text-base font-black text-slate-900 leading-tight">Sanjeevani</h1>
-            <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">ElderCare+</p>
+            <h1 className="text-base font-black text-slate-900 leading-tight">
+              Sanjeevani
+            </h1>
+            <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">
+              ElderCare+
+            </p>
           </div>
         </div>
       </header>
 
       <main className="flex-1 max-w-md mx-auto w-full px-5 pt-8 space-y-6">
         <div className="text-center space-y-1">
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight">{t.title}</h2>
-          <p className="text-xs text-slate-500 font-medium">
-            {t.subtitle}
-          </p>
+          <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+            {t.title}
+          </h2>
+          <p className="text-xs text-slate-500 font-medium">{t.subtitle}</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4 pt-2">
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
+            <label
+              htmlFor="login-identifier"
+              className="block text-xs font-bold text-slate-700 mb-1"
+            >
               {t.labelId}
             </label>
             <div className="relative">
               <input
+                id="login-identifier"
                 type="text"
                 required
                 placeholder={t.placeholderId}
                 value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
+                onChange={(event) => setIdentifier(event.target.value)}
                 className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-xs"
               />
-              <Phone className="absolute right-3.5 top-3.5 size-4 text-slate-400" />
+              <Phone
+                aria-hidden="true"
+                className="absolute right-3.5 top-3.5 size-4 text-slate-400"
+              />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">{t.labelPass}</label>
+            <label
+              htmlFor="login-password"
+              className="block text-xs font-bold text-slate-700 mb-1"
+            >
+              {t.labelPass}
+            </label>
             <div className="relative">
               <input
+                id="login-password"
                 type={showPassword ? 'text' : 'password'}
                 required
                 placeholder={t.placeholderPass}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(event) => setPassword(event.target.value)}
                 className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-xs"
               />
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() => setShowPassword((visible) => !visible)}
+                aria-label={showPassword ? t.hidePassword : t.showPassword}
                 className="absolute right-3 top-3 rounded-lg p-1 text-slate-400 hover:text-slate-600"
               >
-                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                {showPassword ? (
+                  <EyeOff className="size-4" />
+                ) : (
+                  <Eye className="size-4" />
+                )}
               </button>
             </div>
           </div>
@@ -139,10 +228,12 @@ export function ActualLoginScreen({
               <input
                 type="checkbox"
                 checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
+                onChange={(event) => setRememberMe(event.target.checked)}
                 className="size-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
               />
-              <span className="text-xs text-slate-600 font-medium">{t.remember}</span>
+              <span className="text-xs text-slate-600 font-medium">
+                {t.remember}
+              </span>
             </label>
 
             <button
