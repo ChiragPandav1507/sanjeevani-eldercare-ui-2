@@ -211,14 +211,16 @@ export function AppointmentsScreen({
           )}
         </div>
 
-        <button
-          type="button"
-          onClick={() => setShowModal(true)}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-700 py-3.5 text-xs font-bold text-white shadow-md hover:bg-emerald-800 active:scale-98 transition-all"
-        >
-          <Plus className="size-4" />
-          Book / Add Appointment
-        </button>
+        {activeTab === 'upcoming' && (
+          <button
+            type="button"
+            onClick={() => setShowModal(true)}
+            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-700 py-3.5 text-xs font-bold text-white shadow-md hover:bg-emerald-800 active:scale-98 transition-all"
+          >
+            <Plus className="size-4" />
+            Book / Add Appointment
+          </button>
+        )}
       </main>
 
       {showModal && (
