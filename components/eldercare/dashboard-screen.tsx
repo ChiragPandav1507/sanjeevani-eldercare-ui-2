@@ -35,6 +35,14 @@ export function DashboardScreen({
 }: DashboardScreenProps) {
   const isEn = language === 'en';
 
+  const appointmentLabel = isEn
+    ? appointmentText === 'Koi Appointment Nahi'
+      ? 'No Appointments'
+      : appointmentText
+    : appointmentText === 'Koi Appointment Nahi'
+      ? 'कोई अपॉइंटमेंट नहीं'
+      : `${appointmentText.match(/\d+/)?.[0] ?? ''} आगामी अपॉइंटमेंट`;
+
   return (
     <div className="flex min-h-screen flex-col bg-[#f8fafc] text-slate-800 pb-12 select-none">
       <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3.5 shadow-xs sticky top-0 z-20">
@@ -43,8 +51,12 @@ export function DashboardScreen({
             <Heart className="size-5 fill-current" />
           </div>
           <div>
-            <h1 className="text-base font-black text-slate-900 leading-tight">Sanjeevani</h1>
-            <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">ElderCare+</p>
+            <h1 className="text-base font-black text-slate-900 leading-tight">
+              Sanjeevani
+            </h1>
+            <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">
+              ElderCare+
+            </p>
           </div>
         </div>
 
@@ -54,7 +66,7 @@ export function DashboardScreen({
           className="flex items-center gap-1.5 rounded-xl bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 border border-emerald-200 hover:bg-emerald-100 active:scale-95 transition-all"
         >
           <Mic className="size-4" />
-          <span>Saathi</span>
+          <span>{isEn ? 'Saathi' : 'साथी'}</span>
         </button>
       </header>
 
@@ -69,9 +81,13 @@ export function DashboardScreen({
               <AlertOctagon className="size-7" />
             </div>
             <div className="text-left">
-              <h2 className="text-lg font-black tracking-wide leading-tight">EMERGENCY SOS</h2>
+              <h2 className="text-lg font-black tracking-wide leading-tight">
+                {isEn ? 'EMERGENCY SOS' : 'आपातकालीन SOS'}
+              </h2>
               <p className="text-xs font-medium text-red-100">
-                {isEn ? 'Instantly alert family and doctor' : 'Turant Parivaar aur Doctor ko alert bhejein'}
+                {isEn
+                  ? 'Instantly alert family and doctor'
+                  : 'परिवार और डॉक्टर को तुरंत सूचित करें'}
               </p>
             </div>
           </div>
@@ -85,18 +101,24 @@ export function DashboardScreen({
         >
           <div className="flex items-center justify-between">
             <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider">
-              AI Health Vision
+              {isEn ? 'AI Health Vision' : 'AI स्वास्थ्य जाँच'}
             </span>
-            <span className="text-xs font-bold text-blue-100">Drug Conflict Guard</span>
+            <span className="text-xs font-bold text-blue-100">
+              {isEn ? 'Drug Conflict Guard' : 'दवाओं की सुरक्षा जाँच'}
+            </span>
           </div>
           <div className="flex items-center gap-3.5 text-left">
             <div className="flex size-12 items-center justify-center rounded-2xl bg-white text-blue-600 shadow-sm shrink-0">
               <Camera className="size-6" />
             </div>
             <div>
-              <h3 className="text-base font-black leading-tight">Scan Doctor Prescription</h3>
+              <h3 className="text-base font-black leading-tight">
+                {isEn ? 'Scan Doctor Prescription' : 'डॉक्टर का पर्चा स्कैन करें'}
+              </h3>
               <p className="text-xs text-blue-100 font-medium">
-                {isEn ? 'Check medicine name, expiry date & safety' : 'Dawaai ka naam, expiry date aur safety check karein'}
+                {isEn
+                  ? 'Check medicine name, expiry date & safety'
+                  : 'दवा का नाम, समाप्ति तिथि और सुरक्षा जाँचें'}
               </p>
             </div>
           </div>
@@ -113,9 +135,12 @@ export function DashboardScreen({
             </div>
             <div>
               <span className="block text-[11px] font-bold text-slate-400">
-                {medicineCount} {isEn ? 'Medicines Left' : 'Dawaai Baaki'}
+                {medicineCount}{' '}
+                {isEn ? 'Medicines Left' : 'दवाइयाँ बाकी'}
               </span>
-              <h3 className="text-sm font-black text-slate-900 leading-tight">Medicine Cabinet</h3>
+              <h3 className="text-sm font-black text-slate-900 leading-tight">
+                {isEn ? 'Medicine Cabinet' : 'दवा अलमारी'}
+              </h3>
             </div>
           </button>
 
@@ -129,9 +154,11 @@ export function DashboardScreen({
             </div>
             <div>
               <span className="block text-[11px] font-bold text-slate-400">
-                {waterCount} / 8 Glasses
+                {waterCount} / 8 {isEn ? 'Glasses' : 'गिलास'}
               </span>
-              <h3 className="text-sm font-black text-slate-900 leading-tight">Water Tracker</h3>
+              <h3 className="text-sm font-black text-slate-900 leading-tight">
+                {isEn ? 'Water Tracker' : 'पानी ट्रैकर'}
+              </h3>
             </div>
           </button>
 
@@ -145,9 +172,11 @@ export function DashboardScreen({
             </div>
             <div>
               <span className="block text-[11px] font-bold text-slate-400">
-                {appointmentText === 'Koi Appointment Nahi' && isEn ? 'No Appointments' : appointmentText}
+                {appointmentLabel}
               </span>
-              <h3 className="text-sm font-black text-slate-900 leading-tight">Appointments</h3>
+              <h3 className="text-sm font-black text-slate-900 leading-tight">
+                {isEn ? 'Appointments' : 'अपॉइंटमेंट'}
+              </h3>
             </div>
           </button>
 
@@ -161,9 +190,12 @@ export function DashboardScreen({
             </div>
             <div>
               <span className="block text-[11px] font-bold text-slate-400">
-                {contactsCount} Contacts Linked
+                {contactsCount}{' '}
+                {isEn ? 'Contacts Linked' : 'संपर्क जुड़े हैं'}
               </span>
-              <h3 className="text-sm font-black text-slate-900 leading-tight">Family Hub</h3>
+              <h3 className="text-sm font-black text-slate-900 leading-tight">
+                {isEn ? 'Family Hub' : 'परिवार केंद्र'}
+              </h3>
             </div>
           </button>
         </div>
@@ -178,9 +210,13 @@ export function DashboardScreen({
               <Activity className="size-5" />
             </div>
             <div className="text-left">
-              <h3 className="text-xs font-black text-slate-900">Daily Health Check-in</h3>
+              <h3 className="text-xs font-black text-slate-900">
+                {isEn ? 'Daily Health Check-in' : 'दैनिक स्वास्थ्य जाँच'}
+              </h3>
               <p className="text-[11px] text-slate-500 font-medium">
-                {isEn ? 'How are you feeling today?' : 'Kaisa mehsus ho raha hai aaj?'}
+                {isEn
+                  ? 'How are you feeling today?'
+                  : 'आज आप कैसा महसूस कर रहे हैं?'}
               </p>
             </div>
           </div>
