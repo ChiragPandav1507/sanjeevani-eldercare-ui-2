@@ -1,7 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Layers, ChevronDown, ChevronUp, Bell, Activity, Mic } from 'lucide-react';
+import {
+  Layers,
+  ChevronDown,
+  ChevronUp,
+  Bell,
+  Activity,
+  Mic,
+} from 'lucide-react';
 import { TalkBackProvider, useTalkBack } from './talkback-provider';
 import { MedicineAlarmModal } from './medicine-alarm-modal';
 import { FallDetectionModal } from './fall-detection-modal';
@@ -137,6 +144,32 @@ const AUDIO_GUIDES: Record<string, Record<string, string>> = {
   },
 };
 
+const APPOINTMENT_SUMMARY: Record<
+  string,
+  { none: string; one: string; many: string }
+> = {
+  en: {
+    none: 'No Appointments',
+    one: '1 Upcoming Appointment',
+    many: '{count} Upcoming Appointments',
+  },
+  hi: {
+    none: 'कोई अपॉइंटमेंट नहीं',
+    one: '1 आगामी अपॉइंटमेंट',
+    many: '{count} आगामी अपॉइंटमेंट',
+  },
+  mr: {
+    none: 'कोणतीही अपॉइंटमेंट नाही',
+    one: '१ आगामी अपॉइंटमेंट',
+    many: '{count} आगामी अपॉइंटमेंट',
+  },
+  bn: {
+    none: 'কোনো অ্যাপয়েন্টমেন্ট নেই',
+    one: '১টি আসন্ন অ্যাপয়েন্টমেন্ট',
+    many: '{count}টি আসন্ন অ্যাপয়েন্টমেন্ট',
+  },
+};
+
 function ScreenSwitcherContent({
   language,
   setLanguage,
@@ -178,6 +211,7 @@ function ScreenSwitcherContent({
   useEffect(() => {
     try {
       const savedData = localStorage.getItem(FAMILY_HUB_STORAGE_KEY);
+
       if (savedData) {
         const parsed = JSON.parse(savedData);
         if (Array.isArray(parsed.emergencyContacts)) {
@@ -208,12 +242,18 @@ function ScreenSwitcherContent({
     (appointment) => appointment.status === 'upcoming'
   ).length;
 
+  const appointmentCopy =
+    APPOINTMENT_SUMMARY[language] ?? APPOINTMENT_SUMMARY.hi;
+
   const appointmentText =
     upcomingAppointmentCount === 0
-      ? 'Koi Appointment Nahi'
-      : `${upcomingAppointmentCount} Upcoming ${
-          upcomingAppointmentCount === 1 ? 'Appointment' : 'Appointments'
-        }`;
+      ? appointmentCopy.none
+      : upcomingAppointmentCount === 1
+        ? appointmentCopy.one
+        : appointmentCopy.many.replace(
+            '{count}',
+            String(upcomingAppointmentCount)
+          );
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -522,7 +562,7 @@ function ScreenSwitcherContent({
           if (action === 'SOS_TRIGGERED') setActive(15);
           if (action === 'MEDICINE_TAKEN') setActive(10);
           if (action === 'WATER_ADDED') {
-            setWaterCount((prev) => prev + 1);
+            setWaterCount((previous) => previous + 1);
           }
         }}
       />
