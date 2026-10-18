@@ -72,6 +72,7 @@ function ScreenSwitcherContent() {
 
   const [language, setLanguage] = useState<string>('hi');
   const [waterCount, setWaterCount] = useState<number>(0);
+  const [recognizedText, setRecognizedText] = useState('');
 
   const [medicines, setMedicines] = useState<
     Array<{
@@ -101,10 +102,8 @@ function ScreenSwitcherContent() {
   useEffect(() => {
     try {
       const savedData = localStorage.getItem(FAMILY_HUB_STORAGE_KEY);
-
       if (savedData) {
         const parsed = JSON.parse(savedData);
-
         if (Array.isArray(parsed.emergencyContacts)) {
           setEmergencyContacts(parsed.emergencyContacts);
         }
@@ -355,17 +354,22 @@ function ScreenSwitcherContent() {
             waterCount={waterCount}
             medicineCount={medicines.length}
             appointmentText={appointmentText}
-            contactsCount={emergencyContacts.length}
+            contactsCount={0}
             onOpenVoice={() => setShowVoiceSaathi(true)}
-            onNavigate={(id) => setActive(id)}
+            onNavigate={(id) => {
+              if (id === 8) setRecognizedText('');
+              setActive(id);
+            }}
           />
         )}
 
         {active === 8 && (
           <PrescriptionScannerScreen
+            language={language}
             onBack={() => setActive(6)}
-            onScanComplete={(mode) => {
+            onScanComplete={(mode, text) => {
               setActiveScanMode(mode);
+              setRecognizedText(text);
               setActive(9);
             }}
           />
@@ -373,11 +377,11 @@ function ScreenSwitcherContent() {
 
         {active === 9 && (
           <PrescriptionResultScreen
+            language={language}
             scanMode={activeScanMode}
+            recognizedText={recognizedText}
             onBack={() => setActive(8)}
-            onSaveToCabinet={() => {
-              setActive(10);
-            }}
+            onSaveToCabinet={() => setActive(10)}
           />
         )}
 
@@ -417,8 +421,6 @@ function ScreenSwitcherContent() {
         {active === 14 && (
           <FamilyHubScreen
             language={language}
-            emergencyContacts={emergencyContacts}
-            setEmergencyContacts={setEmergencyContacts}
             onBack={() => setActive(6)}
           />
         )}
