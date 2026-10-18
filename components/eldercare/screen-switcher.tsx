@@ -48,9 +48,17 @@ function ScreenSwitcherContent() {
 
   const [language, setLanguage] = useState<string>('hi');
   const [waterCount, setWaterCount] = useState<number>(0);
-  
-  // Yahan medicines state hoist ki hai taaki data persist rahe
-  const [medicines, setMedicines] = useState<Array<{ id: string; name: string; dosage: string; time: string; taken: boolean }>>([
+
+  // Keep medicines state here so the data persists while switching screens.
+  const [medicines, setMedicines] = useState<
+    Array<{
+      id: string;
+      name: string;
+      dosage: string;
+      time: string;
+      taken: boolean;
+    }>
+  >([
     {
       id: '1',
       name: '5545475',
@@ -60,7 +68,9 @@ function ScreenSwitcherContent() {
     },
   ]);
 
-  const [appointmentText, setAppointmentText] = useState<string>('Koi Appointment Nahi');
+  const [appointmentText, setAppointmentText] = useState<string>(
+    'Koi Appointment Nahi'
+  );
   const [contactsCount, setContactsCount] = useState<number>(0);
 
   useEffect(() => {
@@ -89,7 +99,12 @@ function ScreenSwitcherContent() {
     };
 
     const message = audioGuides[String(active)];
-    if (message && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+
+    if (
+      message &&
+      typeof window !== 'undefined' &&
+      'speechSynthesis' in window
+    ) {
       const utterance = new SpeechSynthesisUtterance(message);
       utterance.lang = language === 'en' ? 'en-US' : 'hi-IN';
       utterance.rate = 0.9;
@@ -103,18 +118,23 @@ function ScreenSwitcherContent() {
   }, [active, isEnabled, language]);
 
   const [showDevPanel, setShowDevPanel] = useState(false);
-  const [activeScanMode, setActiveScanMode] = useState<'prescription' | 'strip_expiry'>('strip_expiry');
+  const [activeScanMode, setActiveScanMode] = useState<
+    'prescription' | 'strip_expiry'
+  >('strip_expiry');
   const [showAlarm, setShowAlarm] = useState(false);
   const [showFallModal, setShowFallModal] = useState(false);
   const [showVoiceSaathi, setShowVoiceSaathi] = useState(false);
 
   useEffect(() => {
     let lastZ = 0;
+
     const handleMotion = (event: DeviceMotionEvent) => {
       const acc = event.accelerationIncludingGravity;
       if (!acc || acc.z === null) return;
+
       const deltaZ = Math.abs((acc.z || 0) - lastZ);
       lastZ = acc.z || 0;
+
       if (deltaZ > 25) {
         setShowFallModal(true);
       }
@@ -171,7 +191,11 @@ function ScreenSwitcherContent() {
         >
           <Layers className="size-3.5 text-emerald-400" />
           <span>Screen: {active}</span>
-          {showDevPanel ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
+          {showDevPanel ? (
+            <ChevronUp className="size-3" />
+          ) : (
+            <ChevronDown className="size-3" />
+          )}
         </button>
       </div>
 
@@ -213,6 +237,7 @@ function ScreenSwitcherContent() {
             onSelectVisuallyImpaired={() => setActive(3)}
           />
         )}
+
         {active === '2A' && (
           <ElderRegistrationScreen
             language={language}
@@ -220,6 +245,7 @@ function ScreenSwitcherContent() {
             onNext={() => setActive(6)}
           />
         )}
+
         {active === 3 && (
           <VisuallyImpairedRegistrationScreen
             onBack={() => setActive(1)}
@@ -229,6 +255,7 @@ function ScreenSwitcherContent() {
             }}
           />
         )}
+
         {active === 4 && (
           <VoiceFormScreen
             language={language}
@@ -236,6 +263,7 @@ function ScreenSwitcherContent() {
             onSubmitSuccess={() => setActive(6)}
           />
         )}
+
         {active === 5 && (
           <LoginScreen
             language={language}
@@ -244,6 +272,7 @@ function ScreenSwitcherContent() {
             onGoToRegister={() => setActive(16)}
           />
         )}
+
         {active === 16 && (
           <ActualLoginScreen
             language={language}
@@ -252,6 +281,7 @@ function ScreenSwitcherContent() {
             onGoToRegister={() => setActive(5)}
           />
         )}
+
         {active === 6 && (
           <DashboardScreen
             language={language}
@@ -263,6 +293,7 @@ function ScreenSwitcherContent() {
             onNavigate={(id) => setActive(id)}
           />
         )}
+
         {active === 8 && (
           <PrescriptionScannerScreen
             onBack={() => setActive(6)}
@@ -272,6 +303,7 @@ function ScreenSwitcherContent() {
             }}
           />
         )}
+
         {active === 9 && (
           <PrescriptionResultScreen
             scanMode={activeScanMode}
@@ -281,6 +313,7 @@ function ScreenSwitcherContent() {
             }}
           />
         )}
+
         {active === 10 && (
           <MedicineCabinetScreen
             medicines={medicines}
@@ -288,9 +321,11 @@ function ScreenSwitcherContent() {
             onBack={() => setActive(6)}
           />
         )}
+
         {active === 11 && (
           <AppointmentsScreen onBack={() => setActive(6)} />
         )}
+
         {active === 12 && (
           <WaterTrackerScreen
             waterCount={waterCount}
@@ -298,12 +333,15 @@ function ScreenSwitcherContent() {
             onBack={() => setActive(6)}
           />
         )}
+
         {active === 13 && (
           <DailyWellbeingScreen onBack={() => setActive(6)} />
         )}
+
         {active === 14 && (
           <FamilyHubScreen onBack={() => setActive(6)} />
         )}
+
         {active === 15 && (
           <SosEmergencyScreen onCancel={() => setActive(6)} />
         )}
@@ -329,4 +367,19 @@ function ScreenSwitcherContent() {
         onActionTrigger={(action) => {
           if (action === 'SOS_TRIGGERED') setActive(15);
           if (action === 'MEDICINE_TAKEN') setActive(10);
-          if (action === 'WATER_ADDED') setWaterCount((
+          if (action === 'WATER_ADDED') {
+            setWaterCount((prev) => prev + 1);
+          }
+        }}
+      />
+    </div>
+  );
+}
+
+export function ScreenSwitcher() {
+  return (
+    <TalkBackProvider>
+      <ScreenSwitcherContent />
+    </TalkBackProvider>
+  );
+}
