@@ -16,7 +16,11 @@ import { DashboardScreen } from './dashboard-screen';
 import { PrescriptionScannerScreen } from './prescription-scanner-screen';
 import { PrescriptionResultScreen } from './prescription-result-screen';
 import { MedicineCabinetScreen } from './medicine-cabinet-screen';
-import { AppointmentsScreen } from './appointments-screen';
+import {
+  AppointmentsScreen,
+  INITIAL_APPOINTMENTS,
+  type AppointmentItem,
+} from './appointments-screen';
 import { WaterTrackerScreen } from './water-tracker-screen';
 import { DailyWellbeingScreen } from './daily-wellbeing-screen';
 import { FamilyHubScreen } from './family-hub-screen';
@@ -49,7 +53,6 @@ function ScreenSwitcherContent() {
   const [language, setLanguage] = useState<string>('hi');
   const [waterCount, setWaterCount] = useState<number>(0);
 
-  // Keep medicines state here so the data persists while switching screens.
   const [medicines, setMedicines] = useState<
     Array<{
       id: string;
@@ -68,10 +71,20 @@ function ScreenSwitcherContent() {
     },
   ]);
 
-  const [appointmentText, setAppointmentText] = useState<string>(
-    'Koi Appointment Nahi'
-  );
+  const [appointments, setAppointments] =
+    useState<AppointmentItem[]>(INITIAL_APPOINTMENTS);
   const [contactsCount, setContactsCount] = useState<number>(0);
+
+  const upcomingAppointmentCount = appointments.filter(
+    (appointment) => appointment.status === 'upcoming'
+  ).length;
+
+  const appointmentText =
+    upcomingAppointmentCount === 0
+      ? 'Koi Appointment Nahi'
+      : `${upcomingAppointmentCount} Upcoming ${
+          upcomingAppointmentCount === 1 ? 'Appointment' : 'Appointments'
+        }`;
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -323,7 +336,11 @@ function ScreenSwitcherContent() {
         )}
 
         {active === 11 && (
-          <AppointmentsScreen onBack={() => setActive(6)} />
+          <AppointmentsScreen
+            appointments={appointments}
+            setAppointments={setAppointments}
+            onBack={() => setActive(6)}
+          />
         )}
 
         {active === 12 && (
