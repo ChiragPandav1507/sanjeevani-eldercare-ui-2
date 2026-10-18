@@ -1,25 +1,36 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { ArrowLeft, Droplets, Plus, Minus, Bell } from 'lucide-react';
 import { getStoredWater, setStoredWater } from './state-store';
 
 interface WaterTrackerScreenProps {
   onBack: () => void;
+  waterCount: number;
+  setWaterCount: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export function WaterTrackerScreen({ onBack }: WaterTrackerScreenProps) {
-  const [glasses, setGlasses] = useState(4);
+export function WaterTrackerScreen({
+  onBack,
+  waterCount,
+  setWaterCount,
+}: WaterTrackerScreenProps) {
   const totalGoal = 8;
 
+  // Load today's saved count into the shared state used by the dashboard.
   useEffect(() => {
-    setGlasses(getStoredWater());
-  }, []);
+    const storedCount = getStoredWater();
+    setWaterCount(storedCount);
+  }, [setWaterCount]);
 
-  const progressPercent = Math.min(Math.round((glasses / totalGoal) * 100), 100);
+  const glasses = waterCount;
+  const progressPercent = Math.min(
+    Math.round((glasses / totalGoal) * 100),
+    100
+  );
 
   const addGlass = () => {
-    setGlasses((prev) => {
+    setWaterCount((prev) => {
       const next = prev < 15 ? prev + 1 : prev;
       setStoredWater(next);
       return next;
@@ -27,7 +38,7 @@ export function WaterTrackerScreen({ onBack }: WaterTrackerScreenProps) {
   };
 
   const removeGlass = () => {
-    setGlasses((prev) => {
+    setWaterCount((prev) => {
       const next = prev > 0 ? prev - 1 : prev;
       setStoredWater(next);
       return next;
@@ -57,7 +68,9 @@ export function WaterTrackerScreen({ onBack }: WaterTrackerScreenProps) {
             <Droplets className="size-8 text-white fill-current" />
           </div>
           <div>
-            <h3 className="text-3xl font-black">{glasses} / {totalGoal} Glasses</h3>
+            <h3 className="text-3xl font-black">
+              {glasses} / {totalGoal} Glasses
+            </h3>
             <p className="text-xs text-blue-100 mt-0.5">Daily Hydration Goal</p>
           </div>
 
@@ -68,7 +81,9 @@ export function WaterTrackerScreen({ onBack }: WaterTrackerScreenProps) {
               style={{ width: `${progressPercent}%` }}
             />
           </div>
-          <p className="text-[11px] font-bold text-cyan-100">{progressPercent}% Completed</p>
+          <p className="text-[11px] font-bold text-cyan-100">
+            {progressPercent}% Completed
+          </p>
         </div>
 
         {/* Counter Buttons */}
@@ -83,7 +98,9 @@ export function WaterTrackerScreen({ onBack }: WaterTrackerScreenProps) {
           </button>
 
           <div className="text-center">
-            <span className="text-2xl font-black text-slate-900">{glasses * 250} ml</span>
+            <span className="text-2xl font-black text-slate-900">
+              {glasses * 250} ml
+            </span>
             <p className="text-[11px] text-slate-400">Total Drank Today</p>
           </div>
 
@@ -100,7 +117,9 @@ export function WaterTrackerScreen({ onBack }: WaterTrackerScreenProps) {
         <div className="rounded-2xl border border-cyan-100 bg-cyan-50/70 p-4 flex items-start gap-3">
           <Bell className="size-5 text-cyan-700 shrink-0 mt-0.5" />
           <div>
-            <h4 className="text-xs font-bold text-cyan-950">Next Reminder: 3:00 PM</h4>
+            <h4 className="text-xs font-bold text-cyan-950">
+              Next Reminder: 3:00 PM
+            </h4>
             <p className="text-[11px] text-cyan-800/80 mt-0.5 leading-relaxed">
               Drink 1 full glass of warm or normal water after your afternoon rest.
             </p>
@@ -109,7 +128,9 @@ export function WaterTrackerScreen({ onBack }: WaterTrackerScreenProps) {
 
         {/* Quick Log Glasses Grid */}
         <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-2">
-          <h4 className="text-xs font-bold text-slate-800">Today's Log (Glass Breakdown)</h4>
+          <h4 className="text-xs font-bold text-slate-800">
+            Today's Log (Glass Breakdown)
+          </h4>
           <div className="grid grid-cols-4 gap-2 pt-1">
             {Array.from({ length: totalGoal }).map((_, idx) => (
               <div
@@ -121,7 +142,9 @@ export function WaterTrackerScreen({ onBack }: WaterTrackerScreenProps) {
                 }`}
               >
                 <Droplets className="size-5 fill-current" />
-                <span className="text-[10px] font-bold mt-1">G {idx + 1}</span>
+                <span className="text-[10px] font-bold mt-1">
+                  G {idx + 1}
+                </span>
               </div>
             ))}
           </div>
