@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowLeft, Pill, Plus, Trash2, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Pill, Plus, Trash2 } from 'lucide-react';
 
 interface Medicine {
   id: string;
@@ -15,23 +15,31 @@ interface MedicineCabinetScreenProps {
   medicines: Medicine[];
   setMedicines: React.Dispatch<React.SetStateAction<Medicine[]>>;
   onBack: () => void;
+  language: string;
 }
 
-export function MedicineCabinetScreen({ medicines, setMedicines, onBack }: MedicineCabinetScreenProps) {
+export function MedicineCabinetScreen({
+  medicines,
+  setMedicines,
+  onBack,
+  language,
+}: MedicineCabinetScreenProps) {
+  const isEn = language === 'en';
+
   const [activeTab, setActiveTab] = useState<'current' | 'reminders'>('current');
   const [showAddForm, setShowAddForm] = useState(false);
   const [newName, setNewName] = useState('');
   const [newDosage, setNewDosage] = useState('');
   const [newTime, setNewTime] = useState('8:00 AM');
 
-  const handleAddMedicine = (e: React.FormEvent) => {
+  const handleAddMedicine = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!newName.trim()) return;
 
     const newMed: Medicine = {
       id: Date.now().toString(),
       name: newName,
-      dosage: newDosage || '1 tablet',
+      dosage: newDosage || (isEn ? '1 tablet' : '1 गोली'),
       time: newTime,
       taken: false,
     };
@@ -43,7 +51,7 @@ export function MedicineCabinetScreen({ medicines, setMedicines, onBack }: Medic
   };
 
   const handleDeleteMedicine = (id: string) => {
-    setMedicines(medicines.filter((m) => m.id !== id));
+    setMedicines(medicines.filter((medicine) => medicine.id !== id));
   };
 
   const handleClearAll = () => {
@@ -52,7 +60,11 @@ export function MedicineCabinetScreen({ medicines, setMedicines, onBack }: Medic
 
   const handleToggleTake = (id: string) => {
     setMedicines(
-      medicines.map((m) => (m.id === id ? { ...m, taken: !m.taken } : m))
+      medicines.map((medicine) =>
+        medicine.id === id
+          ? { ...medicine, taken: !medicine.taken }
+          : medicine
+      )
     );
   };
 
@@ -62,12 +74,13 @@ export function MedicineCabinetScreen({ medicines, setMedicines, onBack }: Medic
         <button
           type="button"
           onClick={onBack}
+          aria-label={isEn ? 'Go back' : 'वापस जाएँ'}
           className="flex size-9 items-center justify-center rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 active:scale-95 transition-all"
         >
           <ArrowLeft className="size-5" />
         </button>
         <h1 className="text-base font-black text-slate-900 tracking-tight">
-          Medicine Cabinet
+          {isEn ? 'Medicine Cabinet' : 'दवा अलमारी'}
         </h1>
         <div className="size-9" />
       </header>
@@ -83,7 +96,7 @@ export function MedicineCabinetScreen({ medicines, setMedicines, onBack }: Medic
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            Current Medicines ({medicines.length})
+            {isEn ? 'Current Medicines' : 'वर्तमान दवाइयाँ'} ({medicines.length})
           </button>
           <button
             type="button"
@@ -94,7 +107,7 @@ export function MedicineCabinetScreen({ medicines, setMedicines, onBack }: Medic
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            Reminders
+            {isEn ? 'Reminders' : 'याद दिलाने की सूचनाएँ'}
           </button>
         </div>
 
@@ -108,7 +121,7 @@ export function MedicineCabinetScreen({ medicines, setMedicines, onBack }: Medic
                   className="flex items-center gap-1 text-xs font-bold text-red-600 hover:text-red-700 active:scale-95 transition-all"
                 >
                   <Trash2 className="size-3.5" />
-                  <span>Clear All</span>
+                  <span>{isEn ? 'Clear All' : 'सब हटाएँ'}</span>
                 </button>
               </div>
             )}
@@ -117,13 +130,15 @@ export function MedicineCabinetScreen({ medicines, setMedicines, onBack }: Medic
               <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-8 text-center space-y-2">
                 <Pill className="size-10 text-slate-300 mx-auto" />
                 <p className="text-xs font-bold text-slate-400">
-                  No medicines added yet.
+                  {isEn
+                    ? 'No medicines added yet.'
+                    : 'अभी तक कोई दवा नहीं जोड़ी गई है।'}
                 </p>
               </div>
             ) : (
-              medicines.map((med) => (
+              medicines.map((medicine) => (
                 <div
-                  key={med.id}
+                  key={medicine.id}
                   className="flex items-center justify-between rounded-3xl border border-slate-200 bg-white p-4 shadow-xs"
                 >
                   <div className="flex items-center gap-3">
@@ -132,10 +147,10 @@ export function MedicineCabinetScreen({ medicines, setMedicines, onBack }: Medic
                     </div>
                     <div>
                       <h3 className="text-sm font-black text-slate-900 leading-tight">
-                        {med.name}
+                        {medicine.name}
                       </h3>
                       <p className="text-xs font-medium text-slate-500">
-                        {med.dosage}
+                        {medicine.dosage}
                       </p>
                     </div>
                   </div>
@@ -143,27 +158,36 @@ export function MedicineCabinetScreen({ medicines, setMedicines, onBack }: Medic
                   <div className="flex items-center gap-2">
                     <div className="text-right">
                       <span className="inline-block rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold text-slate-600">
-                        {med.time}
+                        {medicine.time}
                       </span>
                     </div>
 
                     <button
                       type="button"
-                      onClick={() => handleToggleTake(med.id)}
+                      onClick={() => handleToggleTake(medicine.id)}
                       className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-all active:scale-95 ${
-                        med.taken
+                        medicine.taken
                           ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                           : 'border border-slate-300 text-slate-700 hover:bg-slate-50'
                       }`}
                     >
-                      {med.taken ? 'Taken' : 'Take'}
+                      {medicine.taken
+                        ? isEn
+                          ? 'Taken'
+                          : 'ले ली'
+                        : isEn
+                          ? 'Take'
+                          : 'लें'}
                     </button>
 
                     <button
                       type="button"
-                      onClick={() => handleDeleteMedicine(med.id)}
+                      onClick={() => handleDeleteMedicine(medicine.id)}
+                      aria-label={
+                        isEn ? 'Remove medicine' : 'दवा हटाएँ'
+                      }
+                      title={isEn ? 'Remove medicine' : 'दवा हटाएँ'}
                       className="flex size-8 items-center justify-center rounded-xl bg-red-50 text-red-600 hover:bg-red-100 active:scale-95 transition-all"
-                      title="Remove medicine"
                     >
                       <Trash2 className="size-4" />
                     </button>
@@ -178,18 +202,22 @@ export function MedicineCabinetScreen({ medicines, setMedicines, onBack }: Medic
                 className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm space-y-3"
               >
                 <h4 className="text-xs font-black text-slate-900 uppercase">
-                  Add New Medicine
+                  {isEn ? 'Add New Medicine' : 'नई दवा जोड़ें'}
                 </h4>
                 <input
                   type="text"
-                  placeholder="Medicine Name"
+                  placeholder={isEn ? 'Medicine Name' : 'दवा का नाम'}
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-medium focus:outline-emerald-600"
                 />
                 <input
                   type="text"
-                  placeholder="Dosage (e.g. 1 Tablet)"
+                  placeholder={
+                    isEn
+                      ? 'Dosage (e.g. 1 Tablet)'
+                      : 'खुराक (जैसे: 1 गोली)'
+                  }
                   value={newDosage}
                   onChange={(e) => setNewDosage(e.target.value)}
                   className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-medium focus:outline-emerald-600"
@@ -199,14 +227,14 @@ export function MedicineCabinetScreen({ medicines, setMedicines, onBack }: Medic
                     type="submit"
                     className="flex-1 rounded-xl bg-emerald-700 py-2 text-xs font-bold text-white hover:bg-emerald-800 active:scale-95"
                   >
-                    Save
+                    {isEn ? 'Save' : 'सहेजें'}
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowAddForm(false)}
                     className="rounded-xl border border-slate-200 bg-slate-100 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 active:scale-95"
                   >
-                    Cancel
+                    {isEn ? 'Cancel' : 'रद्द करें'}
                   </button>
                 </div>
               </form>
@@ -217,7 +245,7 @@ export function MedicineCabinetScreen({ medicines, setMedicines, onBack }: Medic
                 className="w-full rounded-2xl bg-emerald-700 py-3.5 text-xs font-bold text-white shadow-md hover:bg-emerald-800 active:scale-98 transition-all flex items-center justify-center gap-1.5"
               >
                 <Plus className="size-4" />
-                <span>Add Medicine</span>
+                <span>{isEn ? 'Add Medicine' : 'दवा जोड़ें'}</span>
               </button>
             )}
           </div>
@@ -225,7 +253,9 @@ export function MedicineCabinetScreen({ medicines, setMedicines, onBack }: Medic
 
         {activeTab === 'reminders' && (
           <div className="rounded-3xl border border-slate-200 bg-white p-4 text-center text-xs font-medium text-slate-500">
-            Daily medicine alerts are active.
+            {isEn
+              ? 'Daily medicine alerts are active.'
+              : 'दवाइयों के दैनिक अलर्ट चालू हैं।'}
           </div>
         )}
       </main>
