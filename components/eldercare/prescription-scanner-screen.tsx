@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft,
   Camera,
@@ -15,7 +15,10 @@ import {
 
 interface PrescriptionScannerScreenProps {
   onBack: () => void;
-  onScanComplete: (mode: 'prescription' | 'strip_expiry') => void;
+  onScanComplete: (
+    mode: 'prescription' | 'strip_expiry',
+    recognizedText: string
+  ) => void;
   language: string;
 }
 
@@ -33,18 +36,15 @@ export function PrescriptionScannerScreen({
 }: PrescriptionScannerScreenProps) {
   const isEn = language === 'en';
 
-  const [scanMode, setScanMode] = useState<
-    'strip_expiry' | 'prescription'
-  >('strip_expiry');
+  const [scanMode, setScanMode] =
+    useState<'strip_expiry' | 'prescription'>('strip_expiry');
   const [guidanceStep, setGuidanceStep] =
     useState<GuidanceStep>('LOOKING');
-  const [guidanceText, setGuidanceText] = useState(
-    isEn
-      ? 'Position the camera in front of the medicine.'
-      : 'कैमरा दवा के सामने रखें।'
-  );
+  const [guidanceText, setGuidanceText] = useState('');
   const [voiceEnabled, setVoiceEnabled] = useState(true);
-  const [countdown, setCountdown] = useState<number | null>(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanError, setScanError] = useState('');
+  const [guidanceCycle, setGuidanceCycle] = useState(0);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -61,33 +61,48 @@ export function PrescriptionScannerScreen({
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = isEn ? 'en-US' : 'hi-IN';
-    utterance.rate = 1.0;
+    utterance.rate = 1;
     window.speechSynthesis.speak(utterance);
   };
 
   useEffect(() => {
+    let cancelled = false;
+
     async function startCamera() {
       try {
+        if (!navigator.mediaDevices?.getUserMedia) {
+          throw new Error('Camera access is not available in this browser.');
+        }
+
         const stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: 'environment' },
           audio: false,
         });
-        streamRef.current = stream;
 
+        if (cancelled) {
+          stream.getTracks().forEach((track) => track.stop());
+          return;
+        }
+
+        streamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
       } catch {
-        // Desktop / mock fallback.
+        setScanError(
+          isEn
+            ? 'Camera access failed. Allow camera permission and try again.'
+            : 'कैमरा नहीं खुला। कैमरे की अनुमति दें और फिर कोशिश करें।'
+        );
       }
     }
 
     startCamera();
 
     return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-      }
+      cancelled = true;
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+
       if (
         typeof window !== 'undefined' &&
         'speechSynthesis' in window
@@ -95,80 +110,87 @@ export function PrescriptionScannerScreen({
         window.speechSynthesis.cancel();
       }
     };
-  }, []);
+  }, [isEn]);
 
   useEffect(() => {
     const sequence = isEn
       ? [
           {
             step: 'LOOKING' as GuidanceStep,
-            text: 'Searching for the medicine strip...',
-            voice: 'Place the medicine in front of the camera.',
+            text: 'Place the medicine text inside the frame.',
+            voice: 'Place the medicine text inside the frame.',
             delay: 1500,
           },
           {
             step: 'MOVE_RIGHT' as GuidanceStep,
-            text: 'Move the camera slightly to the right.',
-            voice: 'The medicine is slightly to the left. Move the camera a little to the right.',
-            delay: 3500,
+            text: 'Move the camera slightly to the right if needed.',
+            voice: 'Move the camera slightly to the right if needed.',
+            delay: 2500,
           },
           {
             step: 'MOVE_CLOSER' as GuidanceStep,
             text: 'Hold steady and move a little closer.',
-            voice: 'The text is a little far away. Move the camera slightly closer.',
-            delay: 3500,
+            voice: 'Hold steady and move a little closer.',
+            delay: 2500,
           },
           {
             step: 'HOLD_STEADY' as GuidanceStep,
-            text: 'Perfect alignment! Hold steady; scanning automatically...',
-            voice: 'Perfect alignment. Hold still; scanning is in progress.',
-            delay: 2500,
+            text: 'Ready. Tap the camera button to read the text.',
+            voice: 'Ready. Tap the camera button to read the text.',
+            delay: 1500,
           },
         ]
       : [
           {
             step: 'LOOKING' as GuidanceStep,
-            text: 'दवा की स्ट्रिप खोजी जा रही है...',
-            voice: 'दवा को कैमरे के सामने रखें।',
+            text: 'दवा पर लिखा नाम फ्रेम के अंदर रखें।',
+            voice: 'दवा पर लिखा नाम फ्रेम के अंदर रखें।',
             delay: 1500,
           },
           {
             step: 'MOVE_RIGHT' as GuidanceStep,
-            text: 'कैमरे को थोड़ा दाईं ओर करें।',
-            voice: 'दवा थोड़ी बाईं ओर है। कैमरे को थोड़ा दाईं ओर करें।',
-            delay: 3500,
+            text: 'ज़रूरत हो तो कैमरे को थोड़ा दाईं ओर करें।',
+            voice: 'ज़रूरत हो तो कैमरे को थोड़ा दाईं ओर करें।',
+            delay: 2500,
           },
           {
             step: 'MOVE_CLOSER' as GuidanceStep,
-            text: 'स्थिर रखें और कैमरे को थोड़ा पास लाएँ।',
-            voice: 'लिखावट थोड़ी दूर है। कैमरे को हल्का सा आगे लाएँ।',
-            delay: 3500,
+            text: 'कैमरे को स्थिर रखें और थोड़ा पास लाएँ।',
+            voice: 'कैमरे को स्थिर रखें और थोड़ा पास लाएँ।',
+            delay: 2500,
           },
           {
             step: 'HOLD_STEADY' as GuidanceStep,
-            text: 'सही स्थिति! स्थिर रखें, अपने आप स्कैन हो रहा है...',
-            voice: 'सही स्थिति। बिल्कुल न हिलें, स्कैन हो रहा है।',
-            delay: 2500,
+            text: 'तैयार। लिखावट पढ़ने के लिए कैमरा बटन दबाएँ।',
+            voice: 'तैयार। लिखावट पढ़ने के लिए कैमरा बटन दबाएँ।',
+            delay: 1500,
           },
         ];
 
-    let currentIdx = 0;
-    let timer: ReturnType<typeof setTimeout> | null = null;
+    let currentIndex = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
 
     const runGuidance = () => {
-      if (currentIdx < sequence.length) {
-        const current = sequence[currentIdx];
-        setGuidanceStep(current.step);
-        setGuidanceText(current.text);
-        speakGuide(current.voice);
+      const step = sequence[currentIndex];
 
-        timer = setTimeout(() => {
-          currentIdx += 1;
-          runGuidance();
-        }, current.delay);
-      } else {
-        setCountdown(3);
+      if (!step) {
+        setGuidanceStep('HOLD_STEADY');
+        setGuidanceText(
+          isEn
+            ? 'Ready. Tap the camera button to read the text.'
+            : 'तैयार। लिखावट पढ़ने के लिए कैमरा बटन दबाएँ।'
+        );
+        return;
       }
+
+      setGuidanceStep(step.step);
+      setGuidanceText(step.text);
+      speakGuide(step.voice);
+
+      timer = setTimeout(() => {
+        currentIndex += 1;
+        runGuidance();
+      }, step.delay);
     };
 
     runGuidance();
@@ -176,28 +198,78 @@ export function PrescriptionScannerScreen({
     return () => {
       if (timer) clearTimeout(timer);
     };
-  }, [scanMode, voiceEnabled, language]);
+  }, [scanMode, voiceEnabled, language, guidanceCycle]);
 
-  useEffect(() => {
-    if (countdown === null) return;
+  const handleCapture = async () => {
+    if (isScanning) return;
 
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-
-    if (countdown === 0) {
-      setGuidanceStep('CAPTURED');
-      speakGuide(
+    const video = videoRef.current;
+    if (!video || !video.videoWidth || !video.videoHeight) {
+      setScanError(
         isEn
-          ? 'Scan successful. Opening the results screen.'
-          : 'स्कैन सफल रहा। परिणाम स्क्रीन खोली जा रही है।'
+          ? 'The camera is not ready. Check camera permission and try again.'
+          : 'कैमरा तैयार नहीं है। कैमरे की अनुमति जाँचें और फिर कोशिश करें।'
       );
-      setTimeout(() => {
-        onScanComplete(scanMode);
-      }, 800);
+      return;
     }
-  }, [countdown]);
+
+    setIsScanning(true);
+    setScanError('');
+    setGuidanceStep('CAPTURED');
+    setGuidanceText(
+      isEn ? 'Reading text from the image...' : 'तस्वीर से लिखावट पढ़ी जा रही है...'
+    );
+
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      const context = canvas.getContext('2d');
+      if (!context) {
+        throw new Error('Could not prepare the camera image.');
+      }
+
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      const { createWorker } = await import('tesseract.js');
+      const worker = await createWorker('eng');
+
+      let recognizedText = '';
+
+      try {
+        const result = await worker.recognize(canvas);
+        recognizedText = result.data.text.trim();
+      } finally {
+        await worker.terminate();
+      }
+
+      if (!recognizedText) {
+        setScanError(
+          isEn
+            ? 'No readable text was found. Move closer, improve the lighting, and try again.'
+            : 'पढ़ने योग्य लिखावट नहीं मिली। कैमरे को पास लाएँ, रोशनी बेहतर करें और फिर कोशिश करें।'
+        );
+        setGuidanceStep('LOOKING');
+        setGuidanceText(
+          isEn ? 'Try scanning the medicine again.' : 'दवा को फिर से स्कैन करें।'
+        );
+        return;
+      }
+
+      onScanComplete(scanMode, recognizedText);
+    } catch (error) {
+      console.error('OCR scan failed:', error);
+      setScanError(
+        isEn
+          ? 'Text scanning failed. Check your connection and try again.'
+          : 'लिखावट स्कैन नहीं हो सकी। इंटरनेट कनेक्शन जाँचकर फिर कोशिश करें।'
+      );
+      setGuidanceStep('LOOKING');
+    } finally {
+      setIsScanning(false);
+    }
+  };
 
   return (
     <div className="relative flex min-h-screen flex-col bg-slate-950 text-white select-none">
@@ -246,15 +318,21 @@ export function PrescriptionScannerScreen({
             ) {
               window.speechSynthesis.cancel();
             }
-            setVoiceEnabled(!voiceEnabled);
+            setVoiceEnabled((enabled) => !enabled);
           }}
           className={`rounded-full p-2.5 backdrop-blur-md transition-all active:scale-95 ${
             voiceEnabled
               ? 'bg-emerald-600 text-white'
               : 'bg-white/20 text-slate-300'
           }`}
-          title={isEn ? 'Toggle Voice Guidance' : 'आवाज़ संबंधी निर्देश चालू/बंद करें'}
-          aria-label={isEn ? 'Toggle voice guidance' : 'आवाज़ संबंधी निर्देश बदलें'}
+          title={
+            isEn
+              ? 'Toggle Voice Guidance'
+              : 'आवाज़ संबंधी निर्देश चालू/बंद करें'
+          }
+          aria-label={
+            isEn ? 'Toggle voice guidance' : 'आवाज़ संबंधी निर्देश बदलें'
+          }
         >
           {voiceEnabled ? (
             <Volume2 className="size-5" />
@@ -277,29 +355,30 @@ export function PrescriptionScannerScreen({
 
         <div
           className={`relative z-20 flex size-72 flex-col items-center justify-between rounded-3xl border-4 p-4 transition-all duration-300 ${
-            guidanceStep === 'HOLD_STEADY' || countdown !== null
+            guidanceStep === 'HOLD_STEADY'
               ? 'border-emerald-500 shadow-[0_0_40px_rgba(16,185,129,0.5)] scale-105'
-              : guidanceStep === 'MOVE_RIGHT'
+              : guidanceStep === 'MOVE_RIGHT' ||
+                  guidanceStep === 'MOVE_CLOSER'
                 ? 'border-amber-400 shadow-[0_0_30px_rgba(251,191,36,0.4)]'
                 : 'border-white/60 shadow-2xl'
           }`}
         >
           <div className="flex w-full items-center justify-between">
             <span className="rounded-md bg-black/60 px-2 py-0.5 text-[10px] font-black uppercase text-white/80">
-              {isEn ? 'AI Spatial Sensor' : 'AI दिशा सेंसर'}
+              {isEn ? 'Text Scanner' : 'लिखावट स्कैनर'}
             </span>
             {guidanceStep === 'HOLD_STEADY' && (
-              <span className="flex items-center gap-1 rounded-md bg-emerald-500 px-2 py-0.5 text-[10px] font-black uppercase text-white animate-pulse">
+              <span className="flex items-center gap-1 rounded-md bg-emerald-500 px-2 py-0.5 text-[10px] font-black uppercase text-white">
                 <Sparkles className="size-3" />
-                {isEn ? 'Centered' : 'बीच में'}
+                {isEn ? 'Ready' : 'तैयार'}
               </span>
             )}
           </div>
 
           <div className="flex flex-col items-center justify-center">
-            {countdown !== null ? (
-              <div className="flex size-20 items-center justify-center rounded-full bg-emerald-500 text-white text-4xl font-black shadow-2xl animate-ping">
-                {countdown || '✓'}
+            {isScanning ? (
+              <div className="flex size-20 items-center justify-center rounded-full bg-emerald-500 text-white text-sm font-black shadow-2xl animate-pulse">
+                {isEn ? 'Reading…' : 'पढ़ रहा है…'}
               </div>
             ) : guidanceStep === 'MOVE_RIGHT' ? (
               <div className="flex items-center gap-2 rounded-2xl bg-amber-500/90 px-4 py-2 text-slate-950 font-black text-sm shadow-xl animate-bounce">
@@ -325,38 +404,54 @@ export function PrescriptionScannerScreen({
             <span className="text-[11px] font-medium text-white/70">
               {scanMode === 'strip_expiry'
                 ? isEn
-                  ? 'Strip Boundary Zone'
-                  : 'दवा की स्ट्रिप का क्षेत्र'
+                  ? 'Keep medicine text in the frame'
+                  : 'दवा की लिखावट फ्रेम में रखें'
                 : isEn
-                  ? 'Prescription Sheet'
-                  : 'डॉक्टर के पर्चे का क्षेत्र'}
+                  ? 'Keep prescription text in the frame'
+                  : 'पर्चे की लिखावट फ्रेम में रखें'}
             </span>
           </div>
         </div>
 
         <div className="absolute inset-x-4 bottom-28 z-30 flex items-center justify-center">
           <div className="flex items-center gap-2.5 rounded-2xl bg-black/80 px-4 py-3 text-center border border-white/20 backdrop-blur-md shadow-2xl max-w-sm">
-            <Volume2 className="size-4 shrink-0 text-emerald-400 animate-pulse" />
+            <Volume2 className="size-4 shrink-0 text-emerald-400" />
             <p className="text-xs font-bold text-white tracking-wide">
               {guidanceText}
             </p>
           </div>
         </div>
+
+        {scanError && (
+          <div
+            role="alert"
+            className="absolute inset-x-4 bottom-4 z-40 rounded-xl border border-red-300 bg-red-950/90 p-3 text-center text-xs font-semibold text-white"
+          >
+            {scanError}
+          </div>
+        )}
       </div>
 
       <div className="relative z-30 flex items-center justify-around bg-black/90 p-6 border-t border-white/10 pb-10">
         <button
           type="button"
+          disabled={isScanning}
           onClick={() => {
-            setCountdown(null);
+            setScanError('');
+            setGuidanceCycle((cycle) => cycle + 1);
             setGuidanceStep('LOOKING');
+            setGuidanceText(
+              isEn
+                ? 'Position the medicine text inside the frame.'
+                : 'दवा पर लिखा नाम फ्रेम के अंदर रखें।'
+            );
             speakGuide(
               isEn
-                ? 'Aligning again.'
-                : 'दोबारा सही स्थिति में लाया जा रहा है।'
+                ? 'Position the medicine text inside the frame.'
+                : 'दवा पर लिखा नाम फ्रेम के अंदर रखें।'
             );
           }}
-          className="flex flex-col items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-white"
+          className="flex flex-col items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-white disabled:opacity-50"
         >
           <RotateCcw className="size-5" />
           <span>{isEn ? 'Reset' : 'रीसेट करें'}</span>
@@ -364,12 +459,10 @@ export function PrescriptionScannerScreen({
 
         <button
           type="button"
-          onClick={() => {
-            setGuidanceStep('CAPTURED');
-            onScanComplete(scanMode);
-          }}
-          aria-label={isEn ? 'Capture scan' : 'स्कैन करें'}
-          className="flex size-18 items-center justify-center rounded-full bg-white p-1 shadow-2xl ring-4 ring-emerald-500/50 active:scale-95 transition-all"
+          disabled={isScanning}
+          onClick={handleCapture}
+          aria-label={isEn ? 'Capture and read text' : 'फोटो लेकर लिखावट पढ़ें'}
+          className="flex size-18 items-center justify-center rounded-full bg-white p-1 shadow-2xl ring-4 ring-emerald-500/50 active:scale-95 transition-all disabled:opacity-60"
         >
           <div className="size-14 rounded-full bg-emerald-600 border-2 border-white flex items-center justify-center">
             <Camera className="size-7 text-white" />
