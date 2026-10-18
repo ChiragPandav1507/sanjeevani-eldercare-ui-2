@@ -25,7 +25,8 @@ export function LoginScreen({
   const t = isEn
     ? {
         title: 'Create Account',
-        subtitle: 'Sign up for your Sanjeevani account to stay healthy and connected',
+        subtitle:
+          'Sign up for your Sanjeevani account to stay healthy and connected',
         labelId: 'Mobile Number or Email',
         placeholderId: 'Enter mobile number or email',
         labelPass: 'Set Password',
@@ -50,14 +51,18 @@ export function LoginScreen({
         loginLink: 'यहाँ लॉगिन करें',
       };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     if (!identifier.trim() || !password.trim()) return;
 
     try {
       localStorage.setItem(
         'user_session',
-        JSON.stringify({ user: identifier, loggedInAt: Date.now() })
+        JSON.stringify({
+          user: identifier,
+          loggedInAt: Date.now(),
+        })
       );
     } catch (err) {
       console.error(err);
@@ -74,18 +79,22 @@ export function LoginScreen({
             <Heart className="size-5 fill-current" />
           </div>
           <div>
-            <h1 className="text-base font-black text-slate-900 leading-tight">Sanjeevani</h1>
-            <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">ElderCare+</p>
+            <h1 className="text-base font-black text-slate-900 leading-tight">
+              Sanjeevani
+            </h1>
+            <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">
+              ElderCare+
+            </p>
           </div>
         </div>
       </header>
 
       <main className="flex-1 max-w-md mx-auto w-full px-5 pt-8 space-y-6">
         <div className="text-center space-y-1">
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight">{t.title}</h2>
-          <p className="text-xs text-slate-500 font-medium">
-            {t.subtitle}
-          </p>
+          <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+            {t.title}
+          </h2>
+          <p className="text-xs text-slate-500 font-medium">{t.subtitle}</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4 pt-2">
@@ -107,7 +116,9 @@ export function LoginScreen({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">{t.labelPass}</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1">
+              {t.labelPass}
+            </label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -115,9 +126,57 @@ export function LoginScreen({
                 placeholder={t.placeholderPass}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-xs"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 pr-11 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-xs"
               />
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3 rounded-lg p-1 text-slate-
+                onClick={() => setShowPassword((visible) => !visible)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                className="absolute right-3 top-3 rounded-lg p-1 text-slate-500 hover:bg-slate-100"
+              >
+                {showPassword ? (
+                  <EyeOff className="size-4" />
+                ) : (
+                  <Eye className="size-4" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full rounded-xl bg-emerald-600 py-3 text-sm font-bold text-white shadow-md transition-colors hover:bg-emerald-700 active:scale-[0.99]"
+          >
+            {t.signUp}
+          </button>
+        </form>
+
+        <div className="flex items-center gap-3">
+          <div className="h-px flex-1 bg-slate-200" />
+          <span className="text-[11px] font-bold text-slate-400">{t.or}</span>
+          <div className="h-px flex-1 bg-slate-200" />
+        </div>
+
+        <button
+          type="button"
+          onClick={onContinueGuest}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 text-sm font-bold text-slate-700 shadow-xs transition-colors hover:bg-slate-50 active:scale-[0.99]"
+        >
+          <UserCheck className="size-4" />
+          {t.guest}
+        </button>
+
+        <p className="text-center text-xs text-slate-500">
+          {t.hasAccount}{' '}
+          <button
+            type="button"
+            onClick={onGoToRegister}
+            className="font-bold text-emerald-700 hover:text-emerald-800"
+          >
+            {t.loginLink}
+          </button>
+        </p>
+      </main>
+    </div>
+  );
+}
