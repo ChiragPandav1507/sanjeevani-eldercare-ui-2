@@ -23,7 +23,10 @@ import {
 } from './appointments-screen';
 import { WaterTrackerScreen } from './water-tracker-screen';
 import { DailyWellbeingScreen } from './daily-wellbeing-screen';
-import { FamilyHubScreen } from './family-hub-screen';
+import {
+  FamilyHubScreen,
+  type EmergencyContact,
+} from './family-hub-screen';
 import { SosEmergencyScreen } from './sos-emergency-screen';
 
 const SCREENS = [
@@ -61,6 +64,8 @@ type ScreenId =
   | 14
   | 15;
 
+const FAMILY_HUB_STORAGE_KEY = 'sanjeevani-family-hub';
+
 function ScreenSwitcherContent() {
   const [active, setActive] = useState<ScreenId>(1);
   const { isEnabled } = useTalkBack();
@@ -88,7 +93,41 @@ function ScreenSwitcherContent() {
 
   const [appointments, setAppointments] =
     useState<AppointmentItem[]>(INITIAL_APPOINTMENTS);
-  const [contactsCount, setContactsCount] = useState<number>(0);
+  const [emergencyContacts, setEmergencyContacts] = useState<
+    EmergencyContact[]
+  >([]);
+  const [contactsLoaded, setContactsLoaded] = useState(false);
+
+  useEffect(() => {
+    try {
+      const savedData = localStorage.getItem(FAMILY_HUB_STORAGE_KEY);
+
+      if (savedData) {
+        const parsed = JSON.parse(savedData);
+
+        if (Array.isArray(parsed.emergencyContacts)) {
+          setEmergencyContacts(parsed.emergencyContacts);
+        }
+      }
+    } catch (error) {
+      console.error('Could not load emergency contacts:', error);
+    } finally {
+      setContactsLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!contactsLoaded) return;
+
+    try {
+      localStorage.setItem(
+        FAMILY_HUB_STORAGE_KEY,
+        JSON.stringify({ emergencyContacts })
+      );
+    } catch (error) {
+      console.error('Could not save emergency contacts:', error);
+    }
+  }, [emergencyContacts, contactsLoaded]);
 
   const upcomingAppointmentCount = appointments.filter(
     (appointment) => appointment.status === 'upcoming'
@@ -316,7 +355,7 @@ function ScreenSwitcherContent() {
             waterCount={waterCount}
             medicineCount={medicines.length}
             appointmentText={appointmentText}
-            contactsCount={contactsCount}
+            contactsCount={emergencyContacts.length}
             onOpenVoice={() => setShowVoiceSaathi(true)}
             onNavigate={(id) => setActive(id)}
           />
@@ -378,6 +417,8 @@ function ScreenSwitcherContent() {
         {active === 14 && (
           <FamilyHubScreen
             language={language}
+            emergencyContacts={emergencyContacts}
+            setEmergencyContacts={setEmergencyContacts}
             onBack={() => setActive(6)}
           />
         )}
