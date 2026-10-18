@@ -383,7 +383,10 @@ function ScreenSwitcherContent() {
         )}
 
         {active === 15 && (
-          <SosEmergencyScreen onCancel={() => setActive(6)} />
+          <SosEmergencyScreen
+            language={language}
+            onCancel={() => setActive(6)}
+          />
         )}
       </div>
 
