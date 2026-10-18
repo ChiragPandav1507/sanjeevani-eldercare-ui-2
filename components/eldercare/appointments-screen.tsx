@@ -1,13 +1,16 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowLeft, Calendar, Clock, MapPin, Plus, User, CheckCircle2 } from 'lucide-react';
+import {
+  ArrowLeft,
+  Calendar,
+  Clock,
+  MapPin,
+  Plus,
+  Trash2,
+} from 'lucide-react';
 
-interface AppointmentsScreenProps {
-  onBack: () => void;
-}
-
-interface AppointmentItem {
+export interface AppointmentItem {
   id: number;
   doctor: string;
   specialty: string;
@@ -17,7 +20,7 @@ interface AppointmentItem {
   status: 'upcoming' | 'completed';
 }
 
-const INITIAL_APPOINTMENTS: AppointmentItem[] = [
+export const INITIAL_APPOINTMENTS: AppointmentItem[] = [
   {
     id: 1,
     doctor: 'Dr. Ramesh Sharma',
@@ -47,34 +50,41 @@ const INITIAL_APPOINTMENTS: AppointmentItem[] = [
   },
 ];
 
-export function AppointmentsScreen({ onBack }: AppointmentsScreenProps) {
+interface AppointmentsScreenProps {
+  onBack: () => void;
+  appointments: AppointmentItem[];
+  setAppointments: React.Dispatch<React.SetStateAction<AppointmentItem[]>>;
+}
+
+export function AppointmentsScreen({
+  onBack,
+  appointments,
+  setAppointments,
+}: AppointmentsScreenProps) {
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
-  const [appointments, setAppointments] = useState<AppointmentItem[]>(INITIAL_APPOINTMENTS);
   const [showModal, setShowModal] = useState(false);
 
-  // Form State
   const [doctor, setDoctor] = useState('');
   const [specialty, setSpecialty] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [location, setLocation] = useState('');
 
-  const handleAdd = (e: React.FormEvent) => {
+  const handleAdd = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!doctor.trim()) return;
 
-    setAppointments((prev) => [
-      {
-        id: Date.now(),
-        doctor: doctor.trim(),
-        specialty: specialty.trim() || 'General Checkup',
-        date: date.trim() || 'Upcoming',
-        time: time.trim() || '10:00 AM',
-        location: location.trim() || 'Clinic Visit',
-        status: 'upcoming',
-      },
-      ...prev,
-    ]);
+    const newAppointment: AppointmentItem = {
+      id: Date.now(),
+      doctor: doctor.trim(),
+      specialty: specialty.trim() || 'General Checkup',
+      date: date.trim() || 'Upcoming',
+      time: time.trim() || '10:00 AM',
+      location: location.trim() || 'Clinic Visit',
+      status: 'upcoming',
+    };
+
+    setAppointments((previous) => [newAppointment, ...previous]);
 
     setDoctor('');
     setSpecialty('');
@@ -82,15 +92,23 @@ export function AppointmentsScreen({ onBack }: AppointmentsScreenProps) {
     setTime('');
     setLocation('');
     setShowModal(false);
+    setActiveTab('upcoming');
+  };
+
+  const handleDelete = (id: number) => {
+    setAppointments((previous) =>
+      previous.filter((appointment) => appointment.id !== id)
+    );
   };
 
   const filtered = appointments.filter((item) =>
-    activeTab === 'upcoming' ? item.status === 'upcoming' : item.status === 'completed'
+    activeTab === 'upcoming'
+      ? item.status === 'upcoming'
+      : item.status === 'completed'
   );
 
   return (
     <div className="flex min-h-screen flex-col bg-[#f8fafc] text-slate-800 pb-12 select-none">
-      {/* Header */}
       <header className="sticky top-0 z-20 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 shadow-xs">
         <button
           type="button"
@@ -99,13 +117,13 @@ export function AppointmentsScreen({ onBack }: AppointmentsScreenProps) {
         >
           <ArrowLeft className="size-5" />
         </button>
-        <h2 className="text-sm font-bold text-slate-900">Doctor Appointments</h2>
+        <h2 className="text-sm font-bold text-slate-900">
+          Doctor Appointments
+        </h2>
         <div className="w-10" />
       </header>
 
-      {/* Main Content */}
       <main className="flex-1 max-w-md mx-auto w-full px-4 pt-4 space-y-4">
-        {/* Toggle Bar */}
         <div className="grid grid-cols-2 gap-2 rounded-2xl bg-slate-200/80 p-1">
           <button
             type="button"
@@ -131,7 +149,6 @@ export function AppointmentsScreen({ onBack }: AppointmentsScreenProps) {
           </button>
         </div>
 
-        {/* Appointments List */}
         <div className="space-y-3">
           {filtered.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-xs text-slate-400">
@@ -143,20 +160,35 @@ export function AppointmentsScreen({ onBack }: AppointmentsScreenProps) {
                 key={item.id}
                 className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs space-y-2.5"
               >
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h3 className="text-xs font-black text-slate-900">{item.doctor}</h3>
-                    <p className="text-[11px] font-semibold text-emerald-700">{item.specialty}</p>
+                    <h3 className="text-xs font-black text-slate-900">
+                      {item.doctor}
+                    </h3>
+                    <p className="text-[11px] font-semibold text-emerald-700">
+                      {item.specialty}
+                    </p>
                   </div>
-                  <span
-                    className={`rounded-md px-2 py-0.5 text-[10px] font-bold ${
-                      item.status === 'upcoming'
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : 'bg-slate-100 text-slate-600'
-                    }`}
-                  >
-                    {item.status === 'upcoming' ? 'Scheduled' : 'Visited'}
-                  </span>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span
+                      className={`rounded-md px-2 py-0.5 text-[10px] font-bold ${
+                        item.status === 'upcoming'
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : 'bg-slate-100 text-slate-600'
+                      }`}
+                    >
+                      {item.status === 'upcoming' ? 'Scheduled' : 'Visited'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(item.id)}
+                      aria-label={`Delete appointment with ${item.doctor}`}
+                      title="Delete appointment"
+                      className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+                    >
+                      <Trash2 className="size-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100 text-[11px] text-slate-600">
@@ -179,7 +211,6 @@ export function AppointmentsScreen({ onBack }: AppointmentsScreenProps) {
           )}
         </div>
 
-        {/* Book / Add Button */}
         <button
           type="button"
           onClick={() => setShowModal(true)}
@@ -190,11 +221,12 @@ export function AppointmentsScreen({ onBack }: AppointmentsScreenProps) {
         </button>
       </main>
 
-      {/* Add Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-sm rounded-3xl bg-white p-5 shadow-2xl space-y-3">
-            <h3 className="text-sm font-bold text-slate-900">Add Doctor Appointment</h3>
+            <h3 className="text-sm font-bold text-slate-900">
+              Add Doctor Appointment
+            </h3>
             <form onSubmit={handleAdd} className="space-y-2.5">
               <input
                 type="text"
