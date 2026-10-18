@@ -24,6 +24,121 @@ interface DashboardScreenProps {
   onNavigate: (screenId: any) => void;
 }
 
+const COPY: Record<
+  string,
+  {
+    saathi: string;
+    emergency: string;
+    emergencySubtitle: string;
+    aiVision: string;
+    drugGuard: string;
+    scanPrescription: string;
+    scanSubtitle: string;
+    medicinesLeft: string;
+    medicineLeft: string;
+    medicineCabinet: string;
+    glasses: string;
+    waterTracker: string;
+    noAppointments: string;
+    upcomingAppointment: string;
+    upcomingAppointments: string;
+    appointments: string;
+    contactsLinked: string;
+    familyHub: string;
+    dailyCheckIn: string;
+    feelingToday: string;
+  }
+> = {
+  en: {
+    saathi: 'Saathi',
+    emergency: 'EMERGENCY SOS',
+    emergencySubtitle: 'Instantly alert family and doctor',
+    aiVision: 'AI Health Vision',
+    drugGuard: 'Drug Conflict Guard',
+    scanPrescription: 'Scan Doctor Prescription',
+    scanSubtitle: 'Check medicine name, expiry date & safety',
+    medicinesLeft: 'Medicines Left',
+    medicineLeft: 'Medicine Left',
+    medicineCabinet: 'Medicine Cabinet',
+    glasses: 'Glasses',
+    waterTracker: 'Water Tracker',
+    noAppointments: 'No Appointments',
+    upcomingAppointment: 'Upcoming Appointment',
+    upcomingAppointments: 'Upcoming Appointments',
+    appointments: 'Appointments',
+    contactsLinked: 'Contacts Linked',
+    familyHub: 'Family Hub',
+    dailyCheckIn: 'Daily Health Check-in',
+    feelingToday: 'How are you feeling today?',
+  },
+  hi: {
+    saathi: 'साथी',
+    emergency: 'आपातकालीन SOS',
+    emergencySubtitle: 'परिवार और डॉक्टर को तुरंत सूचित करें',
+    aiVision: 'AI स्वास्थ्य जाँच',
+    drugGuard: 'दवा सुरक्षा जाँच',
+    scanPrescription: 'डॉक्टर का पर्चा स्कैन करें',
+    scanSubtitle: 'दवा का नाम, एक्सपायरी और सुरक्षा जाँचें',
+    medicinesLeft: 'दवाइयाँ बाकी',
+    medicineLeft: 'दवाई बाकी',
+    medicineCabinet: 'दवा अलमारी',
+    glasses: 'गिलास',
+    waterTracker: 'पानी ट्रैकर',
+    noAppointments: 'कोई अपॉइंटमेंट नहीं',
+    upcomingAppointment: 'आगामी अपॉइंटमेंट',
+    upcomingAppointments: 'आगामी अपॉइंटमेंट',
+    appointments: 'अपॉइंटमेंट',
+    contactsLinked: 'संपर्क जुड़े हैं',
+    familyHub: 'परिवार केंद्र',
+    dailyCheckIn: 'दैनिक स्वास्थ्य जाँच',
+    feelingToday: 'आज आप कैसा महसूस कर रहे हैं?',
+  },
+  mr: {
+    saathi: 'साथी',
+    emergency: 'आपत्कालीन SOS',
+    emergencySubtitle: 'कुटुंबीयांना आणि डॉक्टरांना त्वरित कळवा',
+    aiVision: 'AI आरोग्य तपासणी',
+    drugGuard: 'औषध सुरक्षितता तपासणी',
+    scanPrescription: 'डॉक्टरांचे प्रिस्क्रिप्शन स्कॅन करा',
+    scanSubtitle: 'औषधाचे नाव, एक्सपायरी आणि सुरक्षितता तपासा',
+    medicinesLeft: 'औषधे शिल्लक',
+    medicineLeft: 'औषध शिल्लक',
+    medicineCabinet: 'औषध कपाट',
+    glasses: 'ग्लास',
+    waterTracker: 'पाणी ट्रॅकर',
+    noAppointments: 'अपॉइंटमेंट नाहीत',
+    upcomingAppointment: 'आगामी अपॉइंटमेंट',
+    upcomingAppointments: 'आगामी अपॉइंटमेंट्स',
+    appointments: 'अपॉइंटमेंट्स',
+    contactsLinked: 'संपर्क जोडले आहेत',
+    familyHub: 'कुटुंब केंद्र',
+    dailyCheckIn: 'दैनिक आरोग्य तपासणी',
+    feelingToday: 'आज तुम्हाला कसे वाटत आहे?',
+  },
+  bn: {
+    saathi: 'সাথী',
+    emergency: 'জরুরি SOS',
+    emergencySubtitle: 'পরিবার ও ডাক্তারকে সঙ্গে সঙ্গে জানান',
+    aiVision: 'AI স্বাস্থ্য পরীক্ষা',
+    drugGuard: 'ওষুধের নিরাপত্তা পরীক্ষা',
+    scanPrescription: 'ডাক্তারের প্রেসক্রিপশন স্ক্যান করুন',
+    scanSubtitle: 'ওষুধের নাম, মেয়াদ ও নিরাপত্তা পরীক্ষা করুন',
+    medicinesLeft: 'টি ওষুধ বাকি',
+    medicineLeft: 'টি ওষুধ বাকি',
+    medicineCabinet: 'ওষুধের ক্যাবিনেট',
+    glasses: 'গ্লাস',
+    waterTracker: 'জল ট্র্যাকার',
+    noAppointments: 'কোনও অ্যাপয়েন্টমেন্ট নেই',
+    upcomingAppointment: 'টি আসন্ন অ্যাপয়েন্টমেন্ট',
+    upcomingAppointments: 'টি আসন্ন অ্যাপয়েন্টমেন্ট',
+    appointments: 'অ্যাপয়েন্টমেন্ট',
+    contactsLinked: 'টি যোগাযোগ যুক্ত',
+    familyHub: 'পরিবার কেন্দ্র',
+    dailyCheckIn: 'দৈনিক স্বাস্থ্য পরীক্ষা',
+    feelingToday: 'আজ আপনার কেমন লাগছে?',
+  },
+};
+
 export function DashboardScreen({
   language,
   waterCount,
@@ -33,15 +148,42 @@ export function DashboardScreen({
   onOpenVoice,
   onNavigate,
 }: DashboardScreenProps) {
-  const isEn = language === 'en';
+  const t = COPY[language] ?? COPY.hi;
+  const upcomingCount = Number(appointmentText.match(/\d+/)?.[0] ?? 0);
 
-  const appointmentLabel = isEn
-    ? appointmentText === 'Koi Appointment Nahi'
-      ? 'No Appointments'
-      : appointmentText
-    : appointmentText === 'Koi Appointment Nahi'
-      ? 'कोई अपॉइंटमेंट नहीं'
-      : `${appointmentText.match(/\d+/)?.[0] ?? ''} आगामी अपॉइंटमेंट`;
+  let appointmentLabel = t.noAppointments;
+
+  if (upcomingCount > 0) {
+    if (language === 'en') {
+      appointmentLabel =
+        `${upcomingCount} ` +
+        (upcomingCount === 1
+          ? t.upcomingAppointment
+          : t.upcomingAppointments);
+    } else if (language === 'hi') {
+      appointmentLabel = `${upcomingCount} ${t.upcomingAppointments}`;
+    } else if (language === 'mr') {
+      appointmentLabel =
+        `${upcomingCount} ` +
+        (upcomingCount === 1
+          ? t.upcomingAppointment
+          : t.upcomingAppointments);
+    } else {
+      appointmentLabel = `${upcomingCount}${t.upcomingAppointments}`;
+    }
+  }
+
+  const medicineLabel =
+    language === 'en'
+      ? `${medicineCount} ${
+          medicineCount === 1 ? t.medicineLeft : t.medicinesLeft
+        }`
+      : `${medicineCount} ${t.medicinesLeft}`;
+
+  const contactsLabel =
+    language === 'bn'
+      ? `${contactsCount}${t.contactsLinked}`
+      : `${contactsCount} ${t.contactsLinked}`;
 
   return (
     <div className="flex min-h-screen flex-col bg-[#f8fafc] text-slate-800 pb-12 select-none">
@@ -66,7 +208,7 @@ export function DashboardScreen({
           className="flex items-center gap-1.5 rounded-xl bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 border border-emerald-200 hover:bg-emerald-100 active:scale-95 transition-all"
         >
           <Mic className="size-4" />
-          <span>{isEn ? 'Saathi' : 'साथी'}</span>
+          <span>{t.saathi}</span>
         </button>
       </header>
 
@@ -82,12 +224,10 @@ export function DashboardScreen({
             </div>
             <div className="text-left">
               <h2 className="text-lg font-black tracking-wide leading-tight">
-                {isEn ? 'EMERGENCY SOS' : 'आपातकालीन SOS'}
+                {t.emergency}
               </h2>
               <p className="text-xs font-medium text-red-100">
-                {isEn
-                  ? 'Instantly alert family and doctor'
-                  : 'परिवार और डॉक्टर को तुरंत सूचित करें'}
+                {t.emergencySubtitle}
               </p>
             </div>
           </div>
@@ -101,24 +241,23 @@ export function DashboardScreen({
         >
           <div className="flex items-center justify-between">
             <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider">
-              {isEn ? 'AI Health Vision' : 'AI स्वास्थ्य जाँच'}
+              {t.aiVision}
             </span>
             <span className="text-xs font-bold text-blue-100">
-              {isEn ? 'Drug Conflict Guard' : 'दवाओं की सुरक्षा जाँच'}
+              {t.drugGuard}
             </span>
           </div>
+
           <div className="flex items-center gap-3.5 text-left">
             <div className="flex size-12 items-center justify-center rounded-2xl bg-white text-blue-600 shadow-sm shrink-0">
               <Camera className="size-6" />
             </div>
             <div>
               <h3 className="text-base font-black leading-tight">
-                {isEn ? 'Scan Doctor Prescription' : 'डॉक्टर का पर्चा स्कैन करें'}
+                {t.scanPrescription}
               </h3>
               <p className="text-xs text-blue-100 font-medium">
-                {isEn
-                  ? 'Check medicine name, expiry date & safety'
-                  : 'दवा का नाम, समाप्ति तिथि और सुरक्षा जाँचें'}
+                {t.scanSubtitle}
               </p>
             </div>
           </div>
@@ -135,11 +274,10 @@ export function DashboardScreen({
             </div>
             <div>
               <span className="block text-[11px] font-bold text-slate-400">
-                {medicineCount}{' '}
-                {isEn ? 'Medicines Left' : 'दवाइयाँ बाकी'}
+                {medicineLabel}
               </span>
               <h3 className="text-sm font-black text-slate-900 leading-tight">
-                {isEn ? 'Medicine Cabinet' : 'दवा अलमारी'}
+                {t.medicineCabinet}
               </h3>
             </div>
           </button>
@@ -154,10 +292,10 @@ export function DashboardScreen({
             </div>
             <div>
               <span className="block text-[11px] font-bold text-slate-400">
-                {waterCount} / 8 {isEn ? 'Glasses' : 'गिलास'}
+                {waterCount} / 8 {t.glasses}
               </span>
               <h3 className="text-sm font-black text-slate-900 leading-tight">
-                {isEn ? 'Water Tracker' : 'पानी ट्रैकर'}
+                {t.waterTracker}
               </h3>
             </div>
           </button>
@@ -175,7 +313,7 @@ export function DashboardScreen({
                 {appointmentLabel}
               </span>
               <h3 className="text-sm font-black text-slate-900 leading-tight">
-                {isEn ? 'Appointments' : 'अपॉइंटमेंट'}
+                {t.appointments}
               </h3>
             </div>
           </button>
@@ -190,11 +328,10 @@ export function DashboardScreen({
             </div>
             <div>
               <span className="block text-[11px] font-bold text-slate-400">
-                {contactsCount}{' '}
-                {isEn ? 'Contacts Linked' : 'संपर्क जुड़े हैं'}
+                {contactsLabel}
               </span>
               <h3 className="text-sm font-black text-slate-900 leading-tight">
-                {isEn ? 'Family Hub' : 'परिवार केंद्र'}
+                {t.familyHub}
               </h3>
             </div>
           </button>
@@ -211,12 +348,10 @@ export function DashboardScreen({
             </div>
             <div className="text-left">
               <h3 className="text-xs font-black text-slate-900">
-                {isEn ? 'Daily Health Check-in' : 'दैनिक स्वास्थ्य जाँच'}
+                {t.dailyCheckIn}
               </h3>
               <p className="text-[11px] text-slate-500 font-medium">
-                {isEn
-                  ? 'How are you feeling today?'
-                  : 'आज आप कैसा महसूस कर रहे हैं?'}
+                {t.feelingToday}
               </p>
             </div>
           </div>
