@@ -376,7 +376,10 @@ function ScreenSwitcherContent() {
         )}
 
         {active === 14 && (
-          <FamilyHubScreen onBack={() => setActive(6)} />
+          <FamilyHubScreen
+            language={language}
+            onBack={() => setActive(6)}
+          />
         )}
 
         {active === 15 && (
