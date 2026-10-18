@@ -344,6 +344,7 @@ function ScreenSwitcherContent() {
 
         {active === 10 && (
           <MedicineCabinetScreen
+            language={language}
             medicines={medicines}
             setMedicines={setMedicines}
             onBack={() => setActive(6)}
