@@ -66,11 +66,87 @@ type ScreenId =
 
 const FAMILY_HUB_STORAGE_KEY = 'sanjeevani-family-hub';
 
-function ScreenSwitcherContent() {
+const AUDIO_GUIDES: Record<string, Record<string, string>> = {
+  en: {
+    '1': 'Welcome to Sanjeevani Elder Care.',
+    '2A': 'Elder registration screen.',
+    '3': 'Visually impaired registration screen.',
+    '4': 'Voice setup screen.',
+    '5': 'Account creation screen.',
+    '16': 'Login screen.',
+    '6': 'Dashboard. Your health details and updates are here.',
+    '8': 'Prescription scanner camera is open.',
+    '9': 'Prescription results screen.',
+    '10': 'Medicine cabinet screen.',
+    '11': 'Doctor appointments screen.',
+    '12': 'Water tracker screen.',
+    '13': 'Daily wellbeing screen.',
+    '14': 'Family hub screen.',
+    '15': 'Emergency SOS screen.',
+  },
+  hi: {
+    '1': 'संजीवनी एल्डर केयर में आपका स्वागत है।',
+    '2A': 'बुजुर्ग पंजीकरण स्क्रीन।',
+    '3': 'दृष्टिबाधित पंजीकरण स्क्रीन।',
+    '4': 'वॉइस सेटअप स्क्रीन।',
+    '5': 'खाता बनाने की स्क्रीन।',
+    '16': 'लॉगिन स्क्रीन।',
+    '6': 'डैशबोर्ड। यहाँ आपकी स्वास्थ्य जानकारी और अपडेट हैं।',
+    '8': 'पर्चा स्कैन करने का कैमरा खुल गया है।',
+    '9': 'पर्चे के परिणाम की स्क्रीन।',
+    '10': 'दवा अलमारी की स्क्रीन।',
+    '11': 'डॉक्टर अपॉइंटमेंट की स्क्रीन।',
+    '12': 'पानी ट्रैकर की स्क्रीन।',
+    '13': 'दैनिक स्वास्थ्य की स्क्रीन।',
+    '14': 'परिवार केंद्र की स्क्रीन।',
+    '15': 'आपातकालीन सहायता स्क्रीन।',
+  },
+  mr: {
+    '1': 'संजीवनी एल्डर केअरमध्ये तुमचे स्वागत आहे.',
+    '2A': 'ज्येष्ठ नोंदणी स्क्रीन.',
+    '3': 'दृष्टिहीन नोंदणी स्क्रीन.',
+    '4': 'व्हॉइस सेटअप स्क्रीन.',
+    '5': 'खाते तयार करण्याची स्क्रीन.',
+    '16': 'लॉगिन स्क्रीन.',
+    '6': 'डॅशबोर्ड. येथे तुमची आरोग्य माहिती आणि अपडेट्स आहेत.',
+    '8': 'प्रिस्क्रिप्शन स्कॅनर कॅमेरा सुरू आहे.',
+    '9': 'प्रिस्क्रिप्शन निकालांची स्क्रीन.',
+    '10': 'औषध कपाटाची स्क्रीन.',
+    '11': 'डॉक्टरांच्या भेटींची स्क्रीन.',
+    '12': 'पाणी ट्रॅकरची स्क्रीन.',
+    '13': 'दैनिक आरोग्याची स्क्रीन.',
+    '14': 'कुटुंब केंद्राची स्क्रीन.',
+    '15': 'आपत्कालीन मदत स्क्रीन.',
+  },
+  bn: {
+    '1': 'সঞ্জীবনী এল্ডার কেয়ারে আপনাকে স্বাগতম।',
+    '2A': 'প্রবীণ নিবন্ধন স্ক্রিন।',
+    '3': 'দৃষ্টিপ্রতিবন্ধী নিবন্ধন স্ক্রিন।',
+    '4': 'ভয়েস সেটআপ স্ক্রিন।',
+    '5': 'অ্যাকাউন্ট তৈরির স্ক্রিন।',
+    '16': 'লগইন স্ক্রিন।',
+    '6': 'ড্যাশবোর্ড। এখানে আপনার স্বাস্থ্য তথ্য ও আপডেট আছে।',
+    '8': 'প্রেসক্রিপশন স্ক্যানারের ক্যামেরা চালু হয়েছে।',
+    '9': 'প্রেসক্রিপশন ফলাফলের স্ক্রিন।',
+    '10': 'ওষুধের ক্যাবিনেট স্ক্রিন।',
+    '11': 'ডাক্তারের অ্যাপয়েন্টমেন্ট স্ক্রিন।',
+    '12': 'জল ট্র্যাকার স্ক্রিন।',
+    '13': 'দৈনিক সুস্থতার স্ক্রিন।',
+    '14': 'পরিবার কেন্দ্রের স্ক্রিন।',
+    '15': 'জরুরি সহায়তার স্ক্রিন।',
+  },
+};
+
+function ScreenSwitcherContent({
+  language,
+  setLanguage,
+}: {
+  language: string;
+  setLanguage: (language: string) => void;
+}) {
   const [active, setActive] = useState<ScreenId>(1);
   const { isEnabled } = useTalkBack();
 
-  const [language, setLanguage] = useState<string>('hi');
   const [waterCount, setWaterCount] = useState<number>(0);
   const [recognizedText, setRecognizedText] = useState('');
 
@@ -146,33 +222,24 @@ function ScreenSwitcherContent() {
 
     if (!isEnabled) return;
 
-    const audioGuides: Record<string, string> = {
-      '1': 'Namaste! Sanjeevani Elder Care mein aapka swagat hai.',
-      '2A': 'Elder registration screen.',
-      '3': 'Visually impaired registration screen.',
-      '4': 'Voice form khul gaya hai.',
-      '5': 'Account creation screen.',
-      '16': 'Login screen.',
-      '6': 'Dashboard. Yahan aapki saari health details aur updates hain.',
-      '8': 'Prescription scanner camera open ho gaya hai.',
-      '9': 'Prescription result screen.',
-      '10': 'Medicine cabinet screen.',
-      '11': 'Doctor appointments screen.',
-      '12': 'Water tracker screen.',
-      '13': 'Daily wellbeing screen.',
-      '14': 'Family hub khul gaya hai.',
-      '15': 'Emergency SOS screen.',
-    };
-
-    const message = audioGuides[String(active)];
+    const message =
+      AUDIO_GUIDES[language]?.[String(active)] ??
+      AUDIO_GUIDES.hi[String(active)];
 
     if (
       message &&
       typeof window !== 'undefined' &&
       'speechSynthesis' in window
     ) {
+      const locale: Record<string, string> = {
+        en: 'en-IN',
+        hi: 'hi-IN',
+        mr: 'mr-IN',
+        bn: 'bn-IN',
+      };
+
       const utterance = new SpeechSynthesisUtterance(message);
-      utterance.lang = language === 'en' ? 'en-US' : 'hi-IN';
+      utterance.lang = locale[language] ?? 'hi-IN';
       utterance.rate = 0.9;
 
       const timer = setTimeout(() => {
@@ -201,9 +268,7 @@ function ScreenSwitcherContent() {
       const deltaZ = Math.abs((acc.z || 0) - lastZ);
       lastZ = acc.z || 0;
 
-      if (deltaZ > 25) {
-        setShowFallModal(true);
-      }
+      if (deltaZ > 25) setShowFallModal(true);
     };
 
     if (typeof window !== 'undefined' && 'DeviceMotionEvent' in window) {
@@ -273,21 +338,21 @@ function ScreenSwitcherContent() {
           </div>
 
           <div className="grid grid-cols-2 gap-1.5 max-h-60 overflow-y-auto pr-1">
-            {SCREENS.map((s) => (
+            {SCREENS.map((screen) => (
               <button
-                key={s.id}
+                key={screen.id}
                 type="button"
                 onClick={() => {
-                  setActive(s.id as ScreenId);
+                  setActive(screen.id as ScreenId);
                   setShowDevPanel(false);
                 }}
                 className={`rounded-xl px-2.5 py-1.5 text-left text-[11px] font-semibold transition-all ${
-                  active === s.id
+                  active === screen.id
                     ? 'bg-emerald-600 text-white font-bold shadow-xs'
                     : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white'
                 }`}
               >
-                {s.label}
+                {screen.label}
               </button>
             ))}
           </div>
@@ -314,6 +379,7 @@ function ScreenSwitcherContent() {
 
         {active === 3 && (
           <VisuallyImpairedRegistrationScreen
+            language={language}
             onBack={() => setActive(1)}
             onContinue={(mode) => {
               if (mode === 'voice') setActive(4);
@@ -354,7 +420,7 @@ function ScreenSwitcherContent() {
             waterCount={waterCount}
             medicineCount={medicines.length}
             appointmentText={appointmentText}
-            contactsCount={0}
+            contactsCount={emergencyContacts.length}
             onOpenVoice={() => setShowVoiceSaathi(true)}
             onNavigate={(id) => {
               if (id === 8) setRecognizedText('');
@@ -421,6 +487,8 @@ function ScreenSwitcherContent() {
         {active === 14 && (
           <FamilyHubScreen
             language={language}
+            emergencyContacts={emergencyContacts}
+            setEmergencyContacts={setEmergencyContacts}
             onBack={() => setActive(6)}
           />
         )}
@@ -463,9 +531,14 @@ function ScreenSwitcherContent() {
 }
 
 export function ScreenSwitcher() {
+  const [language, setLanguage] = useState('hi');
+
   return (
-    <TalkBackProvider>
-      <ScreenSwitcherContent />
+    <TalkBackProvider language={language}>
+      <ScreenSwitcherContent
+        language={language}
+        setLanguage={setLanguage}
+      />
     </TalkBackProvider>
   );
 }
